@@ -1,0 +1,80 @@
+esphome:
+  name: comfortzone
+  libraries:
+    - https://github.com/vinnyspb/FastCRC.git
+  includes:
+    - comfortzone_esphome.h
+    - comfortzone_heatpump.h
+    - comfortzone_config.h
+    - comfortzone_status.h
+    - comfortzone_frame.h
+    - comfortzone_decoder.h
+    - comfortzone_crafting.h
+    - comfortzone_tools.h
+    - comfortzone_heatpump.cpp
+    - comfortzone_decoder.cpp
+    - comfortzone_decoder_basic.cpp
+    - comfortzone_decoder_status.cpp
+    - comfortzone_crafting.cpp
+
+esp32:
+  board: esp32-s2-saola-1
+  framework:
+    type: esp-idf
+
+uart:
+  id: uart_bus
+  tx_pin: 35
+  rx_pin: 36
+  baud_rate: 19200
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+
+# debug:
+#   update_interval: 5s
+
+sensor:
+- platform: custom
+  lambda: |-
+    auto cz = new esphome::comfortzone::ComfortzoneComponent(id(uart_bus));
+    App.register_component(cz);
+    return {
+      cz->flow_water_temperature, 
+      cz->current_compressor_input_power
+    };
+
+  sensors:
+  - name: "Flow water temperature"
+    unit_of_measurement: °C
+    accuracy_decimals: 1
+  - name: "Current compressor input power"
+    unit_of_measurement: W
+# - platform: debug
+#   free:
+#     name: "Heap Free"
+#   block:
+#     name: "Heap Max Block"
+#   loop_time:
+#     name: "Loop Time"
+
+# Enable logging
+logger:
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  manual_ip:
+    static_ip: 192.168.1.10
+    gateway: 192.168.1.1
+    subnet: 255.255.255.0
+
+  power_save_mode: none
