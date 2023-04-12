@@ -26,32 +26,33 @@ class czcraft
 		KR_AUTO_DAYLIGHT_SAVING_ON,  // enable automatic daylight saving, parameter => always 0xFFBF
 		KR_AUTO_DAYLIGHT_SAVING_OFF, // disable automatic daylight saving, parameter => always 0x0040
 		KR_HOT_WATER_PRIORITY,	// set hot water priority, parameter => 1=low, 2=normal, 3=high
-		KR_STATUS06
+		KR_TEMP_OFFSET_SENSOR0,	// set sensor 0 temperature offset, parameter => -100 (=-10°) to 100 (=10.0°)
+		KR_TEMP_OFFSET_SENSOR1,	// set sensor 1 temperature offset, parameter => -100 (=-10°) to 100 (=10.0°)
+		KR_TEMP_OFFSET_SENSOR2,	// set sensor 2 temperature offset, parameter => -100 (=-10°) to 100 (=10.0°)
+		KR_TEMP_OFFSET_SENSOR3,	// set sensor 3 temperature offset, parameter => -100 (=-10°) to 100 (=10.0°)
+		KR_TEMP_OFFSET_SENSOR4,	// set sensor 4 temperature offset, parameter => -100 (=-10°) to 100 (=10.0°)
+		KR_TEMP_OFFSET_SENSOR5,	// set sensor 5 temperature offset, parameter => -100 (=-10°) to 100 (=10.0°)
+		KR_TEMP_OFFSET_SENSOR6,	// set sensor 6 temperature offset, parameter => -100 (=-10°) to 100 (=10.0°)
+		KR_TEMP_OFFSET_SENSOR7,	// set sensor 7 temperature offset, parameter => -100 (=-10°) to 100 (=10.0°)
 	} KNOWN_REGISTER_CRAFT_NAME;
 
 	// craft a W_CMD packet
 	// input: pointer to output buffer
 	//		  9 byte array contaning register number
 	//		 16bit value (it will be automatically stored into little endian)
-	static void craft_w_cmd(comfortzone_heatpump *czhp, W_CMD *output_buffer, uint8_t *reg_num, uint16_t value);
-
-	// craft a R_CMD packet
-	// input: pointer to output buffer
-	//		  9 byte array contaning register number
-	//		 16bit value (it will be automatically stored into little endian)
-	static void craft_r_cmd(comfortzone_heatpump *czhp, R_CMD *output_buffer, uint8_t *reg_num);
+	static void craft_w_cmd(comfortzone_heatpump *czhp, W_CMD *output_buffer, byte *reg_num, uint16_t value);
 
 	// craft a W_SMALL_CMD packet
 	// input: pointer to output buffer
 	//		  9 byte array contaning register number
 	//		  8bit value
-	static void craft_w_small_cmd(comfortzone_heatpump *czhp, W_SMALL_CMD *output_buffer, uint8_t *reg_num, uint8_t value);
+	static void craft_w_small_cmd(comfortzone_heatpump *czhp, W_SMALL_CMD *output_buffer, byte *reg_num, byte value);
 
 	// craft a W_REPLY packet
 	// input: pointer to output buffer
 	//		  9 byte array contaning register number
 	//		  expected 8bit value
-	static void craft_w_reply(comfortzone_heatpump *czhp, W_REPLY *output_buffer, uint8_t *reg_num, uint8_t value);
+	static void craft_w_reply(comfortzone_heatpump *czhp, W_REPLY *output_buffer, byte *reg_num, byte value);
 };
 
 }

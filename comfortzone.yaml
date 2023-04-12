@@ -18,9 +18,11 @@ esphome:
     - comfortzone_crafting.cpp
 
 esp32:
-  board: esp32-s2-saola-1
+  board: lolin_s2_mini
   framework:
     type: esp-idf
+    # sdkconfig_options:
+    #   CONFIG_ESP_CONSOLE_USB_CDC: y-
 
 uart:
   id: uart_bus
@@ -37,11 +39,15 @@ uart:
 sensor:
 - platform: custom
   lambda: |-
-    auto cz = new esphome::comfortzone::ComfortzoneComponent(id(uart_bus));
+    auto cz = new esphome::comfortzone::ComfortzoneComponent(id(uart_bus), 37);
     App.register_component(cz);
     return {
       cz->flow_water_temperature, 
-      cz->current_compressor_input_power
+      cz->current_compressor_input_power,
+      cz->current_compressor_power,
+      cz->current_add_power,
+      cz->current_total_power,
+      cz->current_compressor_frequency
     };
 
   sensors:
@@ -50,13 +56,23 @@ sensor:
     accuracy_decimals: 1
   - name: "Current compressor input power"
     unit_of_measurement: W
-# - platform: debug
-#   free:
-#     name: "Heap Free"
-#   block:
-#     name: "Heap Max Block"
-#   loop_time:
-#     name: "Loop Time"
+  - name: "Current compressor power"
+    unit_of_measurement: W
+  - name: "Current compressor additional power"
+    unit_of_measurement: W
+  - name: "Current compressor total power"
+    unit_of_measurement: W
+  - name: "Current compressor frequency"
+    unit_of_measurement: Hz
+  - platform: debug
+    free:
+      name: "Heap Free"
+    fragmentation:
+      name: "Heap Fragmentation"
+    block:
+      name: "Heap Max Block"
+    loop_time:
+      name: "Loop Time"
 
 # Enable logging
 logger:

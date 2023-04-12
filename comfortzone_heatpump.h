@@ -31,7 +31,7 @@ namespace esphome::comfortzone {
 
 class comfortzone_heatpump
 {
-public:
+	public:
 	typedef enum processed_frame_type
 	{
 		PFT_NONE,		// no full frame received and process
@@ -41,7 +41,7 @@ public:
 		PFT_UNKNOWN,	// received frame has an unknown type
 	} PROCESSED_FRAME_TYPE;
 
-	comfortzone_heatpump(esphome::uart::UARTDevice* uart_device) : rs485(uart_device) {};
+	comfortzone_heatpump(esphome::uart::UARTDevice* uart_device, int de_pin);
 
 	// Function to call periodically to manage rs485 serial input
 	PROCESSED_FRAME_TYPE process();
@@ -54,9 +54,7 @@ public:
 	// If buffer is not NULL, each time comfortzone_receive() reply is not PFT_NONE, the received frame will
 	// be copied into buffer and *frame_size will be updated
 	// recommended buffer_size is 256 bytes
-	void set_grab_buffer(uint8_t *buffer, uint16_t buffer_size, uint16_t *frame_size);
-
-	bool request_status06(int timeout = 5);
+	void set_grab_buffer(byte *buffer, uint16_t buffer_size, uint16_t *frame_size);
 
 	// Functions to modify heatpump settings
 	// timeout (in second) is the maximum duration before giving up (RS485 bus always busy)
@@ -76,16 +74,18 @@ public:
 	bool set_extra_hot_water(bool enable, int timeout = 5);	// true = enable, false = disable
 	bool set_automatic_daylight_saving(bool enable, int timeout = 5);	// true = enable, false = disable
 
+	bool set_sensor_offset(uint16_t sensor_num, float temp_offset, int timeout = 5);	// sensor: [0:7], offset in °C (-10.0° -> 10.0°)
+
 	// when debug mode is enabled, functions may return messages
 	char last_message[COMFORTZONE_HEATPUMP_LAST_MESSAGE_BUFFER_SIZE] = {0};
 
 	void enable_debug_mode(bool debug_flag);		// true = debug mode on, false = debug mode off
 
 	// modify default address of heatpump
-	void set_heatpump_addr(uint8_t new_heatpump_addr[4]);
+	void set_heatpump_addr(byte new_heatpump_addr[4]);
 
 	// try to guess heatpump address (if needed, must be called after begin)
-	bool guess_heatpump_addr(uint8_t guessed_addr[4], int timeout = 5);
+	bool guess_heatpump_addr(byte guessed_addr[4], int timeout = 5);
 
 	// current status
 	COMFORTZONE_STATUS comfortzone_status;
@@ -95,6 +95,7 @@ public:
 	friend class czcraft;
 
 	esphome::uart::UARTDevice* rs485;
+	int de_pin;
 
 	FastCRC8 CRC8;
 
@@ -104,7 +105,7 @@ public:
 	int last_message_size = 0;
 
 	// incoming buffer
-	uint8_t cz_buf[256];							// incoming RS485 bytes
+	byte cz_buf[256];							// incoming RS485 bytes
 	uint16_t cz_size = 0;					// #bytes in cz_buf
 	uint16_t cz_full_frame_size = -1;	// #bytes in the current frame
 
@@ -113,7 +114,7 @@ public:
 	unsigned long last_reply_frame_timestamp = 0;
 
 	// for debug purpose (see set_grab_buffer() )
-	uint8_t *grab_buffer = NULL;
+	byte *grab_buffer = NULL;
 	uint16_t grab_buffer_size = 0;
 	uint16_t *grab_buffer_frame_size = NULL;
 
@@ -124,14 +125,14 @@ public:
 	bool disable_cz_buf_clear_on_completion = false;
 
 	// RS485 "address of heatpump"
-	uint8_t heatpump_addr[4] = { 0x65, 0x6F, 0xDE, 0x02 };
+	byte heatpump_addr[4] = { 0x65, 0x6F, 0xDE, 0x02 };
 	
 	// RS485 "address of this controller"
-	uint8_t controller_addr[4] = { 0x45, 0x72, 0x69, 0x63 };		// can be anything but must be uniq on this RS485 bus
+	byte controller_addr[4] = { 0x45, 0x72, 0x69, 0x63 };		// can be anything but must be uniq on this RS485 bus
 
 	// send a command to the heatpump and wait for the given reply
 	// on error, several retries may occur and the command may take up to "timeout" seconds
-	bool push_settings(uint8_t *cmd, int cmd_length, uint8_t *expected_reply, int expected_reply_length, int timeout, bool reply_header_check_only = false);
+	bool push_settings(byte *cmd, int cmd_length, byte *expected_reply, int expected_reply_length, int timeout, bool reply_header_check_only = false);
 };
 
 }

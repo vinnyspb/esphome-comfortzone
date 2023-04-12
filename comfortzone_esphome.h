@@ -10,26 +10,24 @@ class ComfortzoneComponent : public Component, public UARTDevice {
  public:
   Sensor *flow_water_temperature = new Sensor();
   Sensor *current_compressor_input_power = new Sensor();
-  unsigned long last_sent = 0;
+  Sensor *current_compressor_power = new Sensor();
+  Sensor *current_add_power = new Sensor();
+  Sensor *current_total_power = new Sensor();
+  Sensor *current_compressor_frequency = new Sensor();
 
-  ComfortzoneComponent(UARTComponent *parent) : UARTDevice(parent) {}
+  int de_pin;
+
+  ComfortzoneComponent(UARTComponent *parent, int de_pin) : UARTDevice(parent), de_pin(de_pin) {}
 
   float get_setup_priority() const override { return esphome::setup_priority::DATA; }
 
   void setup() override {
-    heatpump = new comfortzone_heatpump(this);
+    heatpump = new comfortzone_heatpump(this, de_pin);
   }
 
   void loop() override {
     if(comfortzone_heatpump::PFT_NONE == heatpump->process()) {
       return;
-    }
-
-    unsigned long now = esp_timer_get_time() / 1000;
-    if(now - last_sent >= 30000) {
-      ESP_LOGD(TAG, "SENDING COMMAND");
-      // ESP_LOGD(TAG, "COMMAND SENT: %d", heatpump->request_status06());
-      last_sent = now;
     }
 
     if(heatpump->comfortzone_status.sensors_te1_flow_water_changed) {
@@ -40,6 +38,26 @@ class ComfortzoneComponent : public Component, public UARTDevice {
     if(heatpump->comfortzone_status.heatpump_current_compressor_input_power_changed) {
       current_compressor_input_power->publish_state(heatpump->comfortzone_status.heatpump_current_compressor_input_power);
       heatpump->comfortzone_status.heatpump_current_compressor_input_power_changed = false;
+    }
+
+    if(heatpump->comfortzone_status.heatpump_current_compressor_frequency_changed) {
+      current_compressor_frequency->publish_state((float)heatpump->comfortzone_status.heatpump_current_compressor_frequency / 10.0);
+      heatpump->comfortzone_status.heatpump_current_compressor_frequency_changed = false;
+    }
+
+    if(heatpump->comfortzone_status.heatpump_current_compressor_power_changed) {
+      current_compressor_power->publish_state(heatpump->comfortzone_status.heatpump_current_compressor_power);
+      heatpump->comfortzone_status.heatpump_current_compressor_power_changed = false;
+    }
+
+    if(heatpump->comfortzone_status.heatpump_current_add_power_changed) {
+      current_add_power->publish_state(heatpump->comfortzone_status.heatpump_current_add_power);
+      heatpump->comfortzone_status.heatpump_current_add_power_changed = false;
+    }
+
+    if(heatpump->comfortzone_status.heatpump_current_total_power_changed) {
+      current_total_power->publish_state(heatpump->comfortzone_status.heatpump_current_total_power);
+      heatpump->comfortzone_status.heatpump_current_total_power_changed = false;
     }
   }
 

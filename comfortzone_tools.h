@@ -2,7 +2,7 @@
 
 namespace esphome::comfortzone {
 
-static inline uint16_t get_uint16(uint8_t *ptr)
+static inline uint16_t get_uint16(byte *ptr)
 {
 	uint16_t v;
 
@@ -11,7 +11,7 @@ static inline uint16_t get_uint16(uint8_t *ptr)
 	return v;
 }
 
-static inline int16_t get_int16(uint8_t *ptr)
+static inline int16_t get_int16(byte *ptr)
 {
 	int16_t v;
 
@@ -20,7 +20,7 @@ static inline int16_t get_int16(uint8_t *ptr)
 	return v;
 }
 
-static inline uint32_t get_uint32(uint8_t *ptr)
+static inline uint32_t get_uint32(byte *ptr)
 {
 	uint32_t v;
 

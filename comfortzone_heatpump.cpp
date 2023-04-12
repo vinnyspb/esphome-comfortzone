@@ -8,9 +8,17 @@
 
 #include "comfortzone_crafting.h"
 
+#include "driver/gpio.h"
+
 namespace esphome::comfortzone {
 
 static const char* TAG = "ComfortzoneHeatpump";
+
+comfortzone_heatpump::comfortzone_heatpump(esphome::uart::UARTDevice* uart_device, int de_pin) : rs485(uart_device), de_pin(de_pin)
+{
+	gpio_set_direction((gpio_num_t)de_pin, GPIO_MODE_OUTPUT);
+	gpio_set_level((gpio_num_t)de_pin, 0);
+}
 
 comfortzone_heatpump::PROCESSED_FRAME_TYPE comfortzone_heatpump::process()
 {
@@ -29,10 +37,9 @@ comfortzone_heatpump::PROCESSED_FRAME_TYPE comfortzone_heatpump::process()
 	while(rs485->available())
 	{
 		cz_buf[cz_size++] = rs485->read();
-		// ESP_LOGD(TAG, "%02X", cz_buf[cz_size - 1]);
 
 		if(cz_size == sizeof(cz_buf))
-		{	// something goes wrong. packet size is store in a single byte, how can it go above 255 ???
+		{	// something goes wrong. packet size is store in a single byte, how can it goes above 255 ???
 			// disable_cz_buf_clear_on_completion = true ?
 			cz_size = 0;
 			continue;
@@ -43,9 +50,8 @@ comfortzone_heatpump::PROCESSED_FRAME_TYPE comfortzone_heatpump::process()
 
 		if(cz_size == sizeof(CZ_PACKET_HEADER))
 		{
-			// ESP_LOGD(TAG, "Header acquired");
 			CZ_PACKET_HEADER *czph = (CZ_PACKET_HEADER *)cz_buf;
-			uint8_t comp1_dest[4];
+			byte comp1_dest[4];
 
 			comp1_dest[0] = czph->destination[0] ^ 0xFF;
 			comp1_dest[1] = czph->destination[1] ^ 0xFF;
@@ -75,26 +81,21 @@ comfortzone_heatpump::PROCESSED_FRAME_TYPE comfortzone_heatpump::process()
 	}
 
 	// not enough data received to be a header
-	if(cz_size < sizeof(CZ_PACKET_HEADER)) {
-		// ESP_LOGD(TAG, "not enough data received to be a header");
+	if(cz_size < sizeof(CZ_PACKET_HEADER))
 		return PFT_NONE;
-	}
 
 	// not enough data received to be a packet (header+data)
-	if(cz_size != cz_full_frame_size) {
-		// ESP_LOGD(TAG, "not enough data received to be a packet (header+data)");
+	if(cz_size != cz_full_frame_size)
 		return PFT_NONE;
-	}
 
 	if(cz_size == sizeof(cz_buf))
-	{	// something goes wrong. packet size is stored in a single byte, how can it goes above 255 ???
+	{	// something goes wrong. packet size is store in a single byte, how can it goes above 255 ???
 		// disable_cz_buf_clear_on_completion = true ?
 		cz_size = 0;
-		// ESP_LOGD(TAG, "packet size is stored in a single byte");
 		return PFT_NONE;
 	}
 
-	// check frame CRC (last byte of buffer is CRC)
+	// check frame CRC (last byte of buffer is CRC
 	if(CRC8.maxim(cz_buf, cz_size - 1) == cz_buf[cz_size - 1])
 	{
 		pft = czdec::process_frame(this, (CZ_PACKET_HEADER *)cz_buf);
@@ -137,7 +138,7 @@ comfortzone_heatpump::PROCESSED_FRAME_TYPE comfortzone_heatpump::process()
 // If buffer is not NULL, each time comfortzone_receive() reply is not PFT_NONE, the received frame will
 // be copied into buffer and *frame_size will be updated
 // recommended buffer_size is 256 bytes
-void comfortzone_heatpump::set_grab_buffer(uint8_t *buffer, uint16_t buffer_size, uint16_t *frame_size)
+void comfortzone_heatpump::set_grab_buffer(byte *buffer, uint16_t buffer_size, uint16_t *frame_size)
 {
 	if(buffer == NULL)
 	{
@@ -172,7 +173,7 @@ void comfortzone_heatpump::set_grab_buffer(uint8_t *buffer, uint16_t buffer_size
 
 #define RETURN_MESSAGE(msg)	{ strcpy(last_message, msg); last_message_size = strlen(last_message); }
 
-// fan speed: 1 = low, 2 = normal, 3 = fast
+// fan speed: 1 = low, 2 = normal, 3 = fast, 4 = on timer (HP v1.8)
 bool comfortzone_heatpump::set_fan_speed(uint8_t fan_speed, int timeout)
 {
 	W_SMALL_CMD cmd;
@@ -180,11 +181,21 @@ bool comfortzone_heatpump::set_fan_speed(uint8_t fan_speed, int timeout)
 	czdec::KNOWN_REGISTER *kr;
 	bool push_result;
 
+#if HP_PROTOCOL == HP_PROTOCOL_1_6
 	if((fan_speed < 1) || (fan_speed > 3))
 	{
 		RETURN_MESSAGE("Invalid value, must be between 1 and 3");
 		return false;
 	}
+#endif
+
+#if HP_PROTOCOL == HP_PROTOCOL_1_8
+	if((fan_speed < 1) || (fan_speed > 4))
+	{
+		RETURN_MESSAGE("Invalid value, must be between 1 and 4");
+		return false;
+	}
+#endif
 
 	kr = czdec::kr_craft_name_to_index(czcraft::KR_FAN_SPEED);
 
@@ -197,7 +208,7 @@ bool comfortzone_heatpump::set_fan_speed(uint8_t fan_speed, int timeout)
 	czcraft::craft_w_small_cmd(this, &cmd, kr->reg_num, fan_speed);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, fan_speed);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -237,7 +248,7 @@ bool comfortzone_heatpump::set_room_temperature(float room_temp, int timeout)
 	czcraft::craft_w_cmd(this, &cmd, kr->reg_num, int_value);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, 0);		// reply value is always 0 on success
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -278,7 +289,7 @@ bool comfortzone_heatpump::set_hot_water_temperature(float hot_water_temp, int t
 	czcraft::craft_w_cmd(this, &cmd, kr->reg_num, int_value);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, 1);		// reply value is always 1 on success
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -288,25 +299,6 @@ bool comfortzone_heatpump::set_hot_water_temperature(float hot_water_temp, int t
 	}
 
 	return push_result;
-}
-
-bool comfortzone_heatpump::request_status06(int timeout)
-{
-	R_CMD cmd;
-	R_REPLY_STATUS_06 expected_reply;
-	czdec::KNOWN_REGISTER *kr;
-	bool push_result;
-
-	kr = czdec::kr_craft_name_to_index(czcraft::KR_STATUS06);
-
-	if(kr == NULL)
-	{
-		ESP_LOGD(TAG, "czcraft::KR_STATUS06 not found");
-		return false;
-	}
-
-	czcraft::craft_r_cmd(this, &cmd, kr->reg_num);
-	return push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout, true);
 }
 
 // led level: 0 = off -> 6 = highest level
@@ -334,7 +326,7 @@ bool comfortzone_heatpump::set_led_luminosity(uint8_t led_level, int timeout)
 	czcraft::craft_w_small_cmd(this, &cmd, kr->reg_num, led_level);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, led_level);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -371,7 +363,7 @@ bool comfortzone_heatpump::set_hour(uint8_t hour, int timeout)
 	czcraft::craft_w_small_cmd(this, &cmd, kr->reg_num, hour);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, hour);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -408,7 +400,7 @@ bool comfortzone_heatpump::set_minute(uint8_t minute, int timeout)
 	czcraft::craft_w_small_cmd(this, &cmd, kr->reg_num, minute);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, minute);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -445,7 +437,7 @@ bool comfortzone_heatpump::set_day(uint8_t day, int timeout)
 	czcraft::craft_w_small_cmd(this, &cmd, kr->reg_num, day);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, day);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -482,7 +474,7 @@ bool comfortzone_heatpump::set_month(uint8_t month, int timeout)
 	czcraft::craft_w_small_cmd(this, &cmd, kr->reg_num, month);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, month);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -521,7 +513,7 @@ bool comfortzone_heatpump::set_year(uint16_t year, int timeout)
 	czcraft::craft_w_small_cmd(this, &cmd, kr->reg_num, year);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, year);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -540,7 +532,7 @@ bool comfortzone_heatpump::set_extra_hot_water(bool enable, int timeout)
 	W_REPLY expected_reply;
 	czdec::KNOWN_REGISTER *kr;
 	uint16_t cmd_value;
-	uint8_t reply_value;
+	byte reply_value;
 	bool push_result;
 
 	// Don't know why this setting requires 2 register (???)
@@ -566,7 +558,7 @@ bool comfortzone_heatpump::set_extra_hot_water(bool enable, int timeout)
 	czcraft::craft_w_cmd(this, &cmd, kr->reg_num, cmd_value);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, reply_value);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -585,7 +577,7 @@ bool comfortzone_heatpump::set_automatic_daylight_saving(bool enable, int timeou
 	W_REPLY expected_reply;
 	czdec::KNOWN_REGISTER *kr;
 	uint16_t cmd_value;
-	uint8_t reply_value;
+	byte reply_value;
 	bool push_result;
 
 	// Don't know why this setting requires 2 register (???)
@@ -611,7 +603,7 @@ bool comfortzone_heatpump::set_automatic_daylight_saving(bool enable, int timeou
 	czcraft::craft_w_cmd(this, &cmd, kr->reg_num, cmd_value);
 	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, reply_value);
 
-	push_result = push_settings((uint8_t*)&cmd, sizeof(cmd), (uint8_t*)&expected_reply, sizeof(expected_reply), timeout);
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
 
 	if(push_result == true)
 	{
@@ -624,11 +616,85 @@ bool comfortzone_heatpump::set_automatic_daylight_saving(bool enable, int timeou
 	return push_result;
 }
 
+// Sensor num: 0 -> 7
+// Sensor offset: -10.0 -> 10.0
+bool comfortzone_heatpump::set_sensor_offset(uint16_t sensor_num, float temp_offset, int timeout)
+{
+	W_SMALL_CMD cmd;
+	W_REPLY expected_reply;
+	czdec::KNOWN_REGISTER *kr;
+	czcraft::KNOWN_REGISTER_CRAFT_NAME czname;
+	uint16_t int_temp_offset;
+
+	bool push_result;
+
+	switch(sensor_num)
+	{
+		case 0:
+					czname = czcraft::KR_TEMP_OFFSET_SENSOR0; break;
+
+		case 1:
+					czname = czcraft::KR_TEMP_OFFSET_SENSOR1; break;
+
+		case 2:
+					czname = czcraft::KR_TEMP_OFFSET_SENSOR2; break;
+
+		case 3:
+					czname = czcraft::KR_TEMP_OFFSET_SENSOR3; break;
+
+		case 4:
+					czname = czcraft::KR_TEMP_OFFSET_SENSOR4; break;
+
+		case 5:
+					czname = czcraft::KR_TEMP_OFFSET_SENSOR5; break;
+
+		case 6:
+					czname = czcraft::KR_TEMP_OFFSET_SENSOR6; break;
+
+		case 7:
+					czname = czcraft::KR_TEMP_OFFSET_SENSOR7; break;
+
+		default:
+					RETURN_MESSAGE("Invalid sensor number, must be between 0 and 7");
+					return false;
+	}
+
+	if((temp_offset < -10.0) || (temp_offset > 10.0))
+	{
+		RETURN_MESSAGE("Invalid value, must be between -10.0 and 10.0");
+		return false;
+	}
+
+	kr = czdec::kr_craft_name_to_index(czname);
+
+	if(kr == NULL)
+	{
+		RETURN_MESSAGE("czcraft::KR_TEMP_OFFSET_SENSORx not found");
+		return false;
+	}
+
+	int_temp_offset = (int)(temp_offset * 10.0);
+
+	czcraft::craft_w_small_cmd(this, &cmd, kr->reg_num, int_temp_offset);
+	czcraft::craft_w_reply(this, &expected_reply, kr->reg_num, int_temp_offset);
+
+	push_result = push_settings((byte*)&cmd, sizeof(cmd), (byte*)&expected_reply, sizeof(expected_reply), timeout);
+
+	if(push_result == true)
+	{
+		// on success, immediatly update status cache. Without this, if status cache is sent to client
+		// before receiving update from heatpump, an incorrect value is returned
+		//comfortzone_status.xxx = led_level;
+		// (never stored in cache)
+	}
+	return push_result;
+}
+
 // send a command to the heatpump and wait for the given reply
 // on error, several retries may occur and the command may take up to "timeout" seconds
 // if reply_header_check_only is false, reply must be exactly equal to expected_reply
 // if reply_header_check_only is true, only reply header (CZ_PACKET_HEADER) must match expected_reply header
-bool comfortzone_heatpump::push_settings(uint8_t *cmd, int cmd_length, uint8_t *expected_reply, int expected_reply_length, int timeout, bool header_check_only)
+bool comfortzone_heatpump::push_settings(byte *cmd, int cmd_length, byte *expected_reply, int expected_reply_length, int timeout, bool header_check_only)
 {
 	unsigned long now;
 	unsigned long timeout_time;
@@ -673,7 +739,7 @@ bool comfortzone_heatpump::push_settings(uint8_t *cmd, int cmd_length, uint8_t *
 			{
 				pft = process();
 
-				if(pft == comfortzone_heatpump::PFT_NONE)
+				if(pft != comfortzone_heatpump::PFT_NONE)
 					break;
 
 				now = esp_timer_get_time() / 1000;
@@ -688,10 +754,11 @@ bool comfortzone_heatpump::push_settings(uint8_t *cmd, int cmd_length, uint8_t *
 				if( (debug_mode) && (last_message_size < (COMFORTZONE_HEATPUMP_LAST_MESSAGE_BUFFER_SIZE - 2)) )
 					last_message[last_message_size++] = 'b';
 
-				// disable_cz_buf_clear_on_completion = true;
+				gpio_set_level((gpio_num_t)de_pin, 1); // enable send mode
+				disable_cz_buf_clear_on_completion = true;
 				rs485->write_array(cmd, cmd_length);
 				rs485->flush();
-				return true;
+				gpio_set_level((gpio_num_t)de_pin, 0); // enable receive mode
 
 				// now, wait for a frame at most 100ms
 				now = esp_timer_get_time() / 1000;
@@ -785,7 +852,7 @@ void comfortzone_heatpump::enable_debug_mode(bool debug_flag)
 	last_message_size = 0;
 }
 
-void comfortzone_heatpump::set_heatpump_addr(uint8_t new_heatpump_addr[4])
+void comfortzone_heatpump::set_heatpump_addr(byte new_heatpump_addr[4])
 {
 	heatpump_addr[0] = new_heatpump_addr[0];
 	heatpump_addr[1] = new_heatpump_addr[1];
@@ -794,7 +861,7 @@ void comfortzone_heatpump::set_heatpump_addr(uint8_t new_heatpump_addr[4])
 }
 
 // try to guess heatpump address from query packet sent by control panel
-bool comfortzone_heatpump::guess_heatpump_addr(uint8_t guessed_addr[4], int timeout)
+bool comfortzone_heatpump::guess_heatpump_addr(byte guessed_addr[4], int timeout)
 {
 	unsigned long now;
 	unsigned long timeout_time;
