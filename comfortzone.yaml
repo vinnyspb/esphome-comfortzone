@@ -21,8 +21,9 @@ esp32:
   board: lolin_s2_mini
   framework:
     type: esp-idf
-    # sdkconfig_options:
-    #   CONFIG_ESP_CONSOLE_USB_CDC: y-
+    sdkconfig_options:
+      # CONFIG_ESP_CONSOLE_USB_CDC: y
+      CONFIG_SPIRAM_USE: SPIRAM_USE_MALLOC
 
 uart:
   id: uart_bus
@@ -37,46 +38,116 @@ uart:
 #   update_interval: 5s
 
 sensor:
+# - platform: debug
+#   free:
+#     name: "Heap Free"
+#   block:
+#     name: "Heap Max Block"
+#   loop_time:
+#     name: "Loop Time"
 - platform: custom
   lambda: |-
-    auto cz = new esphome::comfortzone::ComfortzoneComponent(id(uart_bus), 37);
-    App.register_component(cz);
-    return {
-      cz->flow_water_temperature, 
-      cz->current_compressor_input_power,
-      cz->current_compressor_power,
-      cz->current_add_power,
-      cz->current_total_power,
-      cz->current_compressor_frequency
-    };
+    auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+    return cz->get_sensors();
 
   sensors:
-  - name: "Flow water temperature"
-    unit_of_measurement: °C
-    accuracy_decimals: 1
-  - name: "Current compressor input power"
-    unit_of_measurement: W
-  - name: "Current compressor power"
-    unit_of_measurement: W
-  - name: "Current compressor additional power"
-    unit_of_measurement: W
-  - name: "Current compressor total power"
-    unit_of_measurement: W
-  - name: "Current compressor frequency"
-    unit_of_measurement: Hz
-  - platform: debug
-    free:
-      name: "Heap Free"
-    fragmentation:
-      name: "Heap Fragmentation"
-    block:
-      name: "Heap Max Block"
-    loop_time:
-      name: "Loop Time"
+    - name: "Days until filter change"
+      unit_of_measurement: days
+    - name: "Outdoor temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Flow water temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Return water temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Indoor temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Hot gas temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Exchanger out temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Evaporator in temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Exhaust air temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Hot water temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Current compressor frequency"
+      unit_of_measurement: Hz
+    - name: "Current compressor power"
+      unit_of_measurement: W
+    - name: "Current compressor additional power"
+      unit_of_measurement: W
+    - name: "Current compressor total power"
+      unit_of_measurement: W
+    - name: "Current compressor input power"
+      unit_of_measurement: W
+    - name: "Compressor energy"
+      unit_of_measurement: kWh
+    - name: "Additional energy"
+      unit_of_measurement: kWh
+    - name: "Hot water energy"
+      unit_of_measurement: kWh
+    - name: "Compressor runtime"
+      unit_of_measurement: min
+    - name: "Total runtime"
+      unit_of_measurement: min
+    - name: "Room heating setting"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Hot water setting"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "LED luminosity setting"
+    - name: "Fan speed duty"
+      unit_of_measurement: "%"
+    - name: "Hot water calculated setting"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+
+binary_sensor:
+  - platform: custom
+    lambda: |-
+      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+      return cz->get_binary_sensors();
+  
+    binary_sensors:
+      - name: "Filter alarm"
+      - name: "Hot water production"
+      - name: "Room heating in progress"
+      - name: "Additional power enabled"
+      - name: "Defrost enabled"
+      - name: "Extra hot water setting"
+
+text_sensor:
+  # - platform: debug
+  #   device:
+  #     name: "Device Info"
+  #   reset_reason:
+  #     name: "Reset Reason"
+  - platform: custom
+    lambda: |-
+      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+      return cz->get_text_sensors();
+  
+    text_sensors:
+      - name: "Compressor activity"
+      - name: "Mode"
+      - name: "Fan speed"
+      - name: "Hot water priority setting"
 
 # Enable logging
 logger:
-  level: DEBUG
+  level: INFO
+  # hardware_uart: USB_CDC
 
 # Enable Home Assistant API
 api:

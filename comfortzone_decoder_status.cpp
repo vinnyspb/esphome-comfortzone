@@ -18,9 +18,9 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 {
 	R_REPLY_STATUS_01 *q = (R_REPLY_STATUS_01 *)p;
 
-	czhp->comfortzone_status.fan_time_to_filter_change = get_uint16(q->fan_time_to_filter_change);
+	czhp->comfortzone_status.fan_time_to_filter_change->publish_state(get_uint16(q->fan_time_to_filter_change));
 
-	czhp->comfortzone_status.hot_water_setting = get_uint16(q->hot_water_user_setting);
+	czhp->comfortzone_status.hot_water_setting->publish_state((float)get_uint16(q->hot_water_user_setting) / 10.0);
 
 	int reg_v;
 	float reg_v_f;
@@ -215,54 +215,52 @@ void czdec::reply_r_status_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	R_REPLY_STATUS_02 *q = (R_REPLY_STATUS_02 *)p;
 	uint16_t active_alarm;
 
-	czhp->comfortzone_status.sensors_te0_outdoor_temp = get_int16(q->sensors[0]);
-	czhp->comfortzone_status.sensors_te1_flow_water = get_int16(q->sensors[1]);
-	czhp->comfortzone_status.sensors_te1_flow_water_changed = true;
+	czhp->comfortzone_status.sensors_te0_outdoor_temp->publish_state((float)get_int16(q->sensors[0]) / 10.0);
+	czhp->comfortzone_status.sensors_te1_flow_water->publish_state((float)get_int16(q->sensors[1]) / 10.0);
+	czhp->comfortzone_status.sensors_te2_return_water->publish_state((float)get_int16(q->sensors[2]) / 10.0);
+	czhp->comfortzone_status.sensors_te3_indoor_temp->publish_state((float)get_int16(q->sensors[3]) / 10.0);
+	czhp->comfortzone_status.sensors_te4_hot_gas_temp->publish_state((float)get_int16(q->sensors[4]) / 10.0);
+	czhp->comfortzone_status.sensors_te5_exchanger_out->publish_state((float)get_int16(q->sensors[5]) / 10.0);
+	czhp->comfortzone_status.sensors_te6_evaporator_in->publish_state((float)get_int16(q->sensors[6]) / 10.0);
+	czhp->comfortzone_status.sensors_te7_exhaust_air->publish_state((float)get_int16(q->sensors[7]) / 10.0);
+	czhp->comfortzone_status.sensors_te24_hot_water_temp->publish_state((float)get_int16(q->sensors[24]) / 10.0);
 
-	czhp->comfortzone_status.sensors_te2_return_water = get_int16(q->sensors[2]);
-	czhp->comfortzone_status.sensors_te3_indoor_temp= get_int16(q->sensors[3]);
-	czhp->comfortzone_status.sensors_te4_hot_gas_temp = get_int16(q->sensors[4]);
-	czhp->comfortzone_status.sensors_te5_exchanger_out = get_int16(q->sensors[5]);
-	czhp->comfortzone_status.sensors_te6_evaporator_in = get_int16(q->sensors[6]);
-	czhp->comfortzone_status.sensors_te7_exhaust_air = get_int16(q->sensors[7]);
-	czhp->comfortzone_status.sensors_te24_hot_water_temp = get_int16(q->sensors[24]);
-
-	czhp->comfortzone_status.additional_power_enabled = (q->general_status[0] & 0x20) ? true : false;
-	czhp->comfortzone_status.defrost_enabled = (q->general_status[4] & 0x04) ? true : false;
+	czhp->comfortzone_status.additional_power_enabled->publish_state((q->general_status[0] & 0x20) ? true : false);
+	czhp->comfortzone_status.defrost_enabled->publish_state((q->general_status[4] & 0x04) ? true : false);
 
 	switch((q->general_status[1]>>4) & 0x3)
 	{
-		case 0:	czhp->comfortzone_status.compressor_activity = CZCMP_UNKNOWN;
+		case 0:	czhp->comfortzone_status.compressor_activity->publish_state("unknown");
 					break;
 
-		case 1:	czhp->comfortzone_status.compressor_activity = CZCMP_STOPPED;
+		case 1:	czhp->comfortzone_status.compressor_activity->publish_state("stopped");
 					break;
 
-		case 2:	czhp->comfortzone_status.compressor_activity = CZCMP_RUNNING;
+		case 2:	czhp->comfortzone_status.compressor_activity->publish_state("running");
 					break;
 
-		case 3:	czhp->comfortzone_status.compressor_activity = CZCMP_STOPPING;
+		case 3:	czhp->comfortzone_status.compressor_activity->publish_state("stopping");
 					break;
 	}
 
 	switch((q->general_status[1]>>1) & 0x3)
 	{
-		case 0:	czhp->comfortzone_status.mode = CZMD_IDLE;
+		case 0:	czhp->comfortzone_status.mode->publish_state("idle");
 					break;
 
-		case 1:	czhp->comfortzone_status.mode = CZMD_ROOM_HEATING;
+		case 1:	czhp->comfortzone_status.mode->publish_state("heating");
 					break;
 
-		case 2:	czhp->comfortzone_status.mode = CZMD_UNKNOWN;
+		case 2:	czhp->comfortzone_status.mode->publish_state("unknown");
 					break;
 
-		case 3:	czhp->comfortzone_status.mode = CZMD_HOT_WATER;
+		case 3:	czhp->comfortzone_status.mode->publish_state("hot_water");
 					break;
 	}
 
 	active_alarm = get_uint16(q->pending_alarm) ^ get_uint16(q->acknowledged_alarm);
 
-	czhp->comfortzone_status.filter_alarm = (active_alarm & 0x0002) ? true : false ;
+	czhp->comfortzone_status.filter_alarm->publish_state((active_alarm & 0x0002) ? true : false);
 
 	czhp->comfortzone_status.hour = q->hour1;
 	czhp->comfortzone_status.minute = q->minute1;
@@ -588,24 +586,26 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 
 	R_REPLY_STATUS_05 *q = (R_REPLY_STATUS_05 *)p;
 
-	if(q->hot_water_production == 0x00)
-		czhp->comfortzone_status.hot_water_production = false;
-	else
-		czhp->comfortzone_status.hot_water_production = true;
+	czhp->comfortzone_status.hot_water_production->publish_state((q->hot_water_production != 0x00));
 
 	reg_v = get_uint16(q->room_heating_in_progress);
-	if(reg_v == 0x012C)
-		czhp->comfortzone_status.room_heating_in_progress = false;
-	else
-		czhp->comfortzone_status.room_heating_in_progress = true;
+	czhp->comfortzone_status.room_heating_in_progress->publish_state(reg_v != 0x012C);
 
-	czhp->comfortzone_status.fan_speed = q->fan_speed;
-	czhp->comfortzone_status.fan_speed_duty = get_uint16(q->fan_speed_duty);
+	if(q->fan_speed == 1) {
+		czhp->comfortzone_status.fan_speed->publish_state("low");
+	} else if(q->fan_speed == 2) {
+		czhp->comfortzone_status.fan_speed->publish_state("normal");
+	} else if(q->fan_speed == 3) {
+		czhp->comfortzone_status.fan_speed->publish_state("fast");
+	} else {
+		czhp->comfortzone_status.fan_speed->publish_state("incorrect");
+	}
+	czhp->comfortzone_status.fan_speed_duty->publish_state((float)get_uint16(q->fan_speed_duty) / 10.0);
 
-	czhp->comfortzone_status.room_heating_setting = get_uint16(q->heating_calculated_setting);
-	czhp->comfortzone_status.hot_water_calculated_setting = get_uint16(q->hot_water_calculated_setting);
+	czhp->comfortzone_status.room_heating_setting->publish_state((float)get_uint16(q->heating_calculated_setting) / 10.0);
+	czhp->comfortzone_status.hot_water_calculated_setting->publish_state((float)get_uint16(q->hot_water_calculated_setting) / 10.0);
 
-	czhp->comfortzone_status.extra_hot_water_setting = ((q->extra_hot_water == 0x0F)? true : false);
+	czhp->comfortzone_status.extra_hot_water_setting->publish_state((q->extra_hot_water == 0x0F)? true : false);
 
 #ifdef DEBUG
 	float reg_v_f;
@@ -768,255 +768,255 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 #endif
 }
 
-void czdec::reply_r_status_06(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_REPLY *p)
-{
-	R_REPLY_STATUS_06 *q = (R_REPLY_STATUS_06 *)p;
+// void czdec::reply_r_status_06(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_REPLY *p)
+// {
+// 	R_REPLY_STATUS_06 *q = (R_REPLY_STATUS_06 *)p;
 
-	czhp->comfortzone_status.heatpump_current_compressor_frequency = get_uint16(q->heatpump_current_compressor_frequency);
-	czhp->comfortzone_status.heatpump_current_compressor_frequency_changed = true;
+// 	czhp->comfortzone_status.heatpump_current_compressor_frequency = get_uint16(q->heatpump_current_compressor_frequency);
+// 	czhp->comfortzone_status.heatpump_current_compressor_frequency_changed = true;
 
-	czhp->comfortzone_status.heatpump_current_compressor_power = get_uint16(q->heatpump_current_compressor_power);
-	czhp->comfortzone_status.heatpump_current_compressor_power_changed = true;
-	czhp->comfortzone_status.heatpump_current_add_power = get_uint16(q->heatpump_current_add_power);
-	czhp->comfortzone_status.heatpump_current_add_power_changed = true;
-	czhp->comfortzone_status.heatpump_current_total_power = get_uint16(q->heatpump_current_total_power1);
-	czhp->comfortzone_status.heatpump_current_total_power_changed = true;
-	czhp->comfortzone_status.heatpump_current_compressor_input_power = get_uint16(q->heatpump_compressor_input_power);
-	czhp->comfortzone_status.heatpump_current_compressor_input_power_changed = true;
+// 	czhp->comfortzone_status.heatpump_current_compressor_power = get_uint16(q->heatpump_current_compressor_power);
+// 	czhp->comfortzone_status.heatpump_current_compressor_power_changed = true;
+// 	czhp->comfortzone_status.heatpump_current_add_power = get_uint16(q->heatpump_current_add_power);
+// 	czhp->comfortzone_status.heatpump_current_add_power_changed = true;
+// 	czhp->comfortzone_status.heatpump_current_total_power = get_uint16(q->heatpump_current_total_power1);
+// 	czhp->comfortzone_status.heatpump_current_total_power_changed = true;
+// 	czhp->comfortzone_status.heatpump_current_compressor_input_power = get_uint16(q->heatpump_compressor_input_power);
+// 	czhp->comfortzone_status.heatpump_current_compressor_input_power_changed = true;
 
-	int reg_v;
-	float reg_v_f;
+// 	int reg_v;
+// 	float reg_v_f;
 
-	// ===
-	reg_v = get_uint16(q->evaporator_pressure);
+// 	// ===
+// 	reg_v = get_uint16(q->evaporator_pressure);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Evaporator pressure: %f bar", reg_v_f);
+// 	ESP_LOGD(TAG, "Evaporator pressure: %f bar", reg_v_f);
 
-	// ===
-	reg_v = get_uint16(q->pressure_ratio);
+// 	// ===
+// 	reg_v = get_uint16(q->pressure_ratio);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Pressure ratio: %f", reg_v_f);
+// 	ESP_LOGD(TAG, "Pressure ratio: %f", reg_v_f);
 
-	// ===
-	dump_unknown("unknown_s06_0a", q->unknown0a, sizeof(q->unknown0a));
+// 	// ===
+// 	dump_unknown("unknown_s06_0a", q->unknown0a, sizeof(q->unknown0a));
 
-	// ===
-	reg_v = get_uint16(q->heatpump_compressor_max_frequency1);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_compressor_max_frequency1);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	// not real max as it changes autonomously
-	ESP_LOGD(TAG, "Heatpump - Compressor max frequency (1) (erroneous): %f Hz", reg_v_f);
+// 	// not real max as it changes autonomously
+// 	ESP_LOGD(TAG, "Heatpump - Compressor max frequency (1) (erroneous): %f Hz", reg_v_f);
 
-	// ===
-	reg_v = get_uint16(q->hot_water_active_max_frequency);
+// 	// ===
+// 	reg_v = get_uint16(q->hot_water_active_max_frequency);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	// not real max as it changes autonomously
-	ESP_LOGD(TAG, "Hot water - Compressor active max frequency: %f Hz", reg_v_f);
+// 	// not real max as it changes autonomously
+// 	ESP_LOGD(TAG, "Hot water - Compressor active max frequency: %f Hz", reg_v_f);
 
-	// ===
-	// During defrost, forced to 0Hz else set to heating compressor max frequency
-	reg_v = get_uint16(q->heatpump_active_max_frequency1);
+// 	// ===
+// 	// During defrost, forced to 0Hz else set to heating compressor max frequency
+// 	reg_v = get_uint16(q->heatpump_active_max_frequency1);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (1): %f Hz", reg_v_f);
+// 	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (1): %f Hz", reg_v_f);
 
-	// ===
-	dump_unknown("unknown_s06_0c", q->unknown0c, sizeof(q->unknown0c));
+// 	// ===
+// 	dump_unknown("unknown_s06_0c", q->unknown0c, sizeof(q->unknown0c));
 
-	// ===
-	reg_v = get_uint16(q->heatpump_active_max_frequency2);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_active_max_frequency2);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (2): %f Hz", reg_v_f);
+// 	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (2): %f Hz", reg_v_f);
 
-	// ===
-	reg_v = get_uint16(q->heatpump_active_max_frequency3);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_active_max_frequency3);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (3): %f Hz", reg_v_f);
+// 	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (3): %f Hz", reg_v_f);
 
-	// ===
-	reg_v = get_uint16(q->heatpump_current_compressor_frequency);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_current_compressor_frequency);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - current compressor frequency: %f Hz", reg_v_f);
+// 	ESP_LOGD(TAG, "Heatpump - current compressor frequency: %f Hz", reg_v_f);
 
-	// ===
-	reg_v = get_uint16(q->chauffage_compressor_max_frequency3);
+// 	// ===
+// 	reg_v = get_uint16(q->chauffage_compressor_max_frequency3);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Chauffage - Compressor max frequency (3): %f Hz", reg_v_f);
+// 	ESP_LOGD(TAG, "Chauffage - Compressor max frequency (3): %f Hz", reg_v_f);
 
-	// ===
-	dump_unknown("unknown_s06_0d", q->unknown0d, sizeof(q->unknown0d));
+// 	// ===
+// 	dump_unknown("unknown_s06_0d", q->unknown0d, sizeof(q->unknown0d));
 
-	// ===
-	reg_v = get_uint16(q->heating_compressor_min_frequency);
+// 	// ===
+// 	reg_v = get_uint16(q->heating_compressor_min_frequency);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heating - Compressor min frequency: %f Hz", reg_v_f);
+// 	ESP_LOGD(TAG, "Heating - Compressor min frequency: %f Hz", reg_v_f);
 
-	// ===
-	reg_v = get_uint16(q->heating_compressor_max_frequency);
+// 	// ===
+// 	reg_v = get_uint16(q->heating_compressor_max_frequency);
 
-	reg_v_f = reg_v;
-	reg_v_f /= 10.0;
+// 	reg_v_f = reg_v;
+// 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heating - Compressor max frequency: %f Hz", reg_v_f);
+// 	ESP_LOGD(TAG, "Heating - Compressor max frequency: %f Hz", reg_v_f);
 
-	// ===
-	dump_unknown("unknown_s06_0", q->unknown0, sizeof(q->unknown0));
+// 	// ===
+// 	dump_unknown("unknown_s06_0", q->unknown0, sizeof(q->unknown0));
 
-	// ===
-	reg_v = get_uint16(q->heatpump_current_compressor_power);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_current_compressor_power);
 
-	ESP_LOGD(TAG, "Heatpump - current compressor power: %d W", reg_v);
+// 	ESP_LOGD(TAG, "Heatpump - current compressor power: %d W", reg_v);
 
-	// ===
-	reg_v = get_uint16(q->heatpump_current_add_power);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_current_add_power);
 
-	ESP_LOGD(TAG, "Heatpump - current add power: %d W", reg_v);
+// 	ESP_LOGD(TAG, "Heatpump - current add power: %d W", reg_v);
 
-	// ===
-	reg_v = get_uint16(q->heatpump_current_total_power1);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_current_total_power1);
 
-	ESP_LOGD(TAG, "Heatpump - current total power 1: %d W", reg_v);
+// 	ESP_LOGD(TAG, "Heatpump - current total power 1: %d W", reg_v);
 
-	// ===
-	reg_v = get_uint16(q->heatpump_current_total_power2);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_current_total_power2);
 
-	ESP_LOGD(TAG, "Heatpump - current total power 2: %d W", reg_v);
+// 	ESP_LOGD(TAG, "Heatpump - current total power 2: %d W", reg_v);
 
-	// ===
-	reg_v = get_uint16(q->heatpump_compressor_input_power);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_compressor_input_power);
 
-	ESP_LOGD(TAG, "Heatpump - Compressor input power: %d W", reg_v);
+// 	ESP_LOGD(TAG, "Heatpump - Compressor input power: %d W", reg_v);
 
-	// ===
-	dump_unknown("unknown_s06_1a", q->unknown1a, sizeof(q->unknown1a));
+// 	// ===
+// 	dump_unknown("unknown_s06_1a", q->unknown1a, sizeof(q->unknown1a));
 
-	// ===
-	reg_v = get_uint16(q->unknown_count_down);
+// 	// ===
+// 	reg_v = get_uint16(q->unknown_count_down);
 
-	ESP_LOGD(TAG, "Heatpump - remaining min runtime (?): %d seconds", reg_v);
+// 	ESP_LOGD(TAG, "Heatpump - remaining min runtime (?): %d seconds", reg_v);
 
-	// ===
-	dump_unknown("unknown_s06_1b", q->unknown1b, sizeof(q->unknown1b));
+// 	// ===
+// 	dump_unknown("unknown_s06_1b", q->unknown1b, sizeof(q->unknown1b));
 
-	// ===
-	reg_v = get_uint16(q->heatpump_defrost_delay);
+// 	// ===
+// 	reg_v = get_uint16(q->heatpump_defrost_delay);
 
-	ESP_LOGD(TAG, "Heatpump - remaining time to next defrost (=remaining max runtime): %d seconds", reg_v);
+// 	ESP_LOGD(TAG, "Heatpump - remaining time to next defrost (=remaining max runtime): %d seconds", reg_v);
 
-	// ===
-	dump_unknown("unknown_s06_2", q->unknown2, sizeof(q->unknown2));
+// 	// ===
+// 	dump_unknown("unknown_s06_2", q->unknown2, sizeof(q->unknown2));
 
-	// ===
-	reg_v = get_uint16(q->expansion_valve_calculated_setting);
-	reg_v_f = reg_v / 10;
+// 	// ===
+// 	reg_v = get_uint16(q->expansion_valve_calculated_setting);
+// 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Expansion valve - Calculated setting: %f K", reg_v_f);
+// 	ESP_LOGD(TAG, "Expansion valve - Calculated setting: %f K", reg_v_f);
 
-	// ===
-	reg_v = get_int16(q->vanne_expansion_xxx);
-	reg_v_f = reg_v / 10;
+// 	// ===
+// 	reg_v = get_int16(q->vanne_expansion_xxx);
+// 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Vanne expansion - xxx?: %f K", reg_v_f);
+// 	ESP_LOGD(TAG, "Vanne expansion - xxx?: %f K", reg_v_f);
 
-	// ===
-	reg_v = get_int16(q->expansion_valve_temperature_difference1);
-	reg_v_f = reg_v / 10;
+// 	// ===
+// 	reg_v = get_int16(q->expansion_valve_temperature_difference1);
+// 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Expansion valve - Temperature difference 1: %f K", reg_v_f);
+// 	ESP_LOGD(TAG, "Expansion valve - Temperature difference 1: %f K", reg_v_f);
 
-	// ===
-	reg_v = get_int16(q->expansion_valve_temperature_difference2);
-	reg_v_f = reg_v / 10;
+// 	// ===
+// 	reg_v = get_int16(q->expansion_valve_temperature_difference2);
+// 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Expansion valve - Temperature difference 2: %f K", reg_v_f);
+// 	ESP_LOGD(TAG, "Expansion valve - Temperature difference 2: %f K", reg_v_f);
 
-	// ===
-	dump_unknown("unknown_s06_2a", q->unknown2a, sizeof(q->unknown2a));
+// 	// ===
+// 	dump_unknown("unknown_s06_2a", q->unknown2a, sizeof(q->unknown2a));
 
-	// ===
-	reg_v = get_uint16(q->expansion_valve_valve_position1);
-	reg_v_f = reg_v / 10;
+// 	// ===
+// 	reg_v = get_uint16(q->expansion_valve_valve_position1);
+// 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Expansion valve - Valve position 1: %f %%", reg_v_f);
+// 	ESP_LOGD(TAG, "Expansion valve - Valve position 1: %f %%", reg_v_f);
 
-	// ===
-	reg_v = get_uint16(q->expansion_valve_valve_position1);
-	reg_v_f = reg_v / 10;
+// 	// ===
+// 	reg_v = get_uint16(q->expansion_valve_valve_position1);
+// 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Expansion valve - Valve position 2: %f %%", reg_v_f);
+// 	ESP_LOGD(TAG, "Expansion valve - Valve position 2: %f %%", reg_v_f);
 
-	// ===
-	dump_unknown("unknown_s06_2a", q->unknown2a, sizeof(q->unknown2a));
+// 	// ===
+// 	dump_unknown("unknown_s06_2a", q->unknown2a, sizeof(q->unknown2a));
 
-	ESP_LOGD(TAG, "crc: %0X", q->crc);
-}
+// 	ESP_LOGD(TAG, "crc: %0X", q->crc);
+// }
 
-void czdec::reply_r_status_07(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_REPLY *p)
-{
-#ifdef DEBUG
-	R_REPLY_STATUS_07 *q = (R_REPLY_STATUS_07 *)p;
+// void czdec::reply_r_status_07(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_REPLY *p)
+// {
+// #ifdef DEBUG
+// 	R_REPLY_STATUS_07 *q = (R_REPLY_STATUS_07 *)p;
 
-	int reg_v;
-	//float reg_v_f;
+// 	int reg_v;
+// 	//float reg_v_f;
 
-	// ===
-	dump_unknown("unknown_s07", q->unknown, sizeof(q->unknown));
+// 	// ===
+// 	dump_unknown("unknown_s07", q->unknown, sizeof(q->unknown));
 
-	// ===
-	reg_v = get_uint16(q->input_power_limit);
+// 	// ===
+// 	reg_v = get_uint16(q->input_power_limit);
 
-	ESP_LOGD(TAG, "Input power limit: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "W");
+// 	ESP_LOGD(TAG, "Input power limit: ");
+// 	ESP_LOGD(TAG, reg_v);
+// 	ESP_LOGD(TAG, "W");
 
-	// ===
-	dump_unknown("unknown_s07_2", q->unknown2, sizeof(q->unknown2));
+// 	// ===
+// 	dump_unknown("unknown_s07_2", q->unknown2, sizeof(q->unknown2));
 
-	ESP_LOGD(TAG, "crc: ");
-	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
-#endif
-}
+// 	ESP_LOGD(TAG, "crc: ");
+// 	if(q->crc < 0x10)
+// 		ESP_LOGD(TAG, "0");
+// 	ESP_LOGD(TAG, q->crc, HEX);
+// #endif
+// }
 
 void czdec::reply_r_status_08(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_REPLY *p)
 {
 	R_REPLY_STATUS_08 *q = (R_REPLY_STATUS_08 *)p;
 
-	czhp->comfortzone_status.compressor_energy = get_uint32(q->compressor_energy);
-	czhp->comfortzone_status.add_energy = get_uint32(q->add_energy);
-	czhp->comfortzone_status.hot_water_energy = get_uint32(q->hot_water_energy);
+	czhp->comfortzone_status.compressor_energy->publish_state((float)get_uint32(q->compressor_energy) / 100.0);
+	czhp->comfortzone_status.add_energy->publish_state((float)get_uint32(q->add_energy) / 100.0);
+	czhp->comfortzone_status.hot_water_energy->publish_state((float)get_uint32(q->hot_water_energy) / 100.0);
 
-	czhp->comfortzone_status.compressor_runtime = get_uint32(q->compressor_runtime);
-	czhp->comfortzone_status.total_runtime = get_uint32(q->total_runtime);
+	czhp->comfortzone_status.compressor_runtime->publish_state(get_uint32(q->compressor_runtime));
+	czhp->comfortzone_status.total_runtime->publish_state(get_uint32(q->total_runtime));
 
 #ifdef DEBUG
 	int reg_v;
@@ -1138,11 +1138,11 @@ void czdec::reply_r_status_09(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v = get_uint16(q->hotwater_priority);
 
 	if(reg_v == 0x4151)
-		czhp->comfortzone_status.hot_water_priority_setting = 1;
+		czhp->comfortzone_status.hot_water_priority_setting->publish_state("low");
 	else if(reg_v == 0x4152)
-		czhp->comfortzone_status.hot_water_priority_setting = 2;
+		czhp->comfortzone_status.hot_water_priority_setting->publish_state("normal");
 	else if(reg_v == 0x4153)
-		czhp->comfortzone_status.hot_water_priority_setting = 3;
+		czhp->comfortzone_status.hot_water_priority_setting->publish_state("fast");
 
 #ifdef DEBUG
 	float reg_v_f;
@@ -1331,7 +1331,7 @@ void czdec::reply_r_status_11(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 {
 	R_REPLY_STATUS_11 *q = (R_REPLY_STATUS_11 *)p;
 
-	czhp->comfortzone_status.led_luminosity_setting = q->led_luminosity;
+	czhp->comfortzone_status.led_luminosity_setting->publish_state(q->led_luminosity);
 
 #ifdef DEBUG
 	int reg_v;
@@ -1798,7 +1798,7 @@ void czdec::reply_r_status_v180_x40(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 {
 	R_REPLY_STATUS_V180_STATUS_x40 *q = (R_REPLY_STATUS_V180_STATUS_x40 *)p;
 
-	czhp->comfortzone_status.room_heating_setting = get_uint16(q->heating_calculated_setting);
+	czhp->comfortzone_status.room_heating_setting->publish_state((float)get_uint16(q->heating_calculated_setting) / 10.0);
 
 #ifdef DEBUG
 	int reg_v;
@@ -1877,7 +1877,7 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 {
 	R_REPLY_STATUS_V180_STATUS_x8d *q = (R_REPLY_STATUS_V180_STATUS_x8d *)p;
 
-	czhp->comfortzone_status.fan_time_to_filter_change = get_uint16(q->fan_time_to_filter_change);
+	czhp->comfortzone_status.fan_time_to_filter_change->publish_state(get_uint16(q->fan_time_to_filter_change));
 
 #ifdef DEBUG
 	int reg_v;
@@ -2008,12 +2008,12 @@ void czdec::reply_r_status_v180_runtime_and_energy(comfortzone_heatpump *czhp, K
 	R_REPLY_STATUS_V180_STATUS_runtime_and_energy *q = (R_REPLY_STATUS_V180_STATUS_runtime_and_energy *)p;
 
 	// update same informations as "Status 08" but it may be not here
-	czhp->comfortzone_status.compressor_energy = get_uint32(q->compressor_energy);
-	czhp->comfortzone_status.add_energy = get_uint32(q->add_energy);
-	czhp->comfortzone_status.hot_water_energy = get_uint32(q->hot_water_energy);
+	czhp->comfortzone_status.compressor_energy->publish_state((float)get_uint32(q->compressor_energy) / 100.0);
+	czhp->comfortzone_status.add_energy->publish_state((float)get_uint32(q->add_energy) / 100.0);
+	czhp->comfortzone_status.hot_water_energy->publish_state((float)get_uint32(q->hot_water_energy) / 100.0);
 
-	czhp->comfortzone_status.compressor_runtime = get_uint32(q->compressor_runtime);
-	czhp->comfortzone_status.total_runtime = get_uint32(q->total_runtime);
+	czhp->comfortzone_status.compressor_runtime->publish_state(get_uint32(q->compressor_runtime));
+	czhp->comfortzone_status.total_runtime->publish_state(get_uint32(q->total_runtime));
 
 #ifdef DEBUG
 
@@ -2123,7 +2123,7 @@ void czdec::reply_r_status_v180_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *k
 		case 0:	// off 
 		case 1:	// unknown
 		case 7:	// unknown
-					czhp->comfortzone_status.led_luminosity_setting = reg_v;
+					czhp->comfortzone_status.led_luminosity_setting->publish_state(reg_v);
 					break;
 
 		case 2:
@@ -2131,7 +2131,7 @@ void czdec::reply_r_status_v180_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *k
 		case 4:
 		case 5:
 		case 6:
-					czhp->comfortzone_status.led_luminosity_setting = reg_v - 1;
+					czhp->comfortzone_status.led_luminosity_setting->publish_state(reg_v - 1);
 					break;
 	}
 
@@ -2236,19 +2236,14 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	int reg_v;
 	float reg_v_f;
 
-	czhp->comfortzone_status.hot_water_calculated_setting = get_uint16(q->hot_water_calculated_setting);
+	czhp->comfortzone_status.hot_water_calculated_setting->publish_state((float)get_uint16(q->hot_water_calculated_setting) / 10.0);
 
-	czhp->comfortzone_status.heatpump_current_compressor_frequency = get_uint16(q->heatpump_current_compressor_frequency);
-	czhp->comfortzone_status.heatpump_current_compressor_frequency_changed = true;
+	czhp->comfortzone_status.heatpump_current_compressor_frequency->publish_state((float)get_uint16(q->heatpump_current_compressor_frequency) / 10.0);
 
-	czhp->comfortzone_status.heatpump_current_compressor_power = get_uint16(q->heatpump_current_compressor_power);
-	czhp->comfortzone_status.heatpump_current_compressor_power_changed = true;
-	czhp->comfortzone_status.heatpump_current_add_power = get_uint32(q->heatpump_current_add_power);
-	czhp->comfortzone_status.heatpump_current_add_power_changed = true;
-	czhp->comfortzone_status.heatpump_current_total_power = get_uint32(q->heatpump_current_total_power1);
-	czhp->comfortzone_status.heatpump_current_total_power_changed = true;
-	czhp->comfortzone_status.heatpump_current_compressor_input_power = get_uint16(q->heatpump_compressor_input_power);
-	czhp->comfortzone_status.heatpump_current_compressor_input_power_changed = true;
+	czhp->comfortzone_status.heatpump_current_compressor_power->publish_state(get_uint16(q->heatpump_current_compressor_power));
+	czhp->comfortzone_status.heatpump_current_add_power->publish_state(get_uint32(q->heatpump_current_add_power));
+	czhp->comfortzone_status.heatpump_current_total_power->publish_state(get_uint32(q->heatpump_current_total_power1));
+	czhp->comfortzone_status.heatpump_current_compressor_input_power->publish_state(get_uint16(q->heatpump_compressor_input_power));
 
 #ifdef DEBUG
 	int i;
@@ -2785,7 +2780,7 @@ void czdec::reply_r_status_v180_settings(comfortzone_heatpump *czhp, KNOWN_REGIS
 {
 	R_REPLY_STATUS_V180_SETTINGS *q = (R_REPLY_STATUS_V180_SETTINGS *)p;
 
-	czhp->comfortzone_status.hot_water_setting = get_uint16(q->hot_water_user_setting);
+	czhp->comfortzone_status.hot_water_setting->publish_state((float)get_uint16(q->hot_water_user_setting) / 10.0);
 
 #ifdef DEBUG
 
@@ -2822,7 +2817,7 @@ void czdec::reply_r_status_v180_c8a(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 {
 	R_REPLY_STATUS_V180_C8A *q = (R_REPLY_STATUS_V180_C8A *)p;
 
-	czhp->comfortzone_status.fan_speed_duty = get_uint16(q->fan_speed_duty);
+	czhp->comfortzone_status.fan_speed_duty->publish_state((float)get_uint16(q->fan_speed_duty) / 10.0);
 
 	//czhp->comfortzone_status.fan_speed = q->fan_speed;
 

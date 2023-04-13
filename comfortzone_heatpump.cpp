@@ -16,6 +16,9 @@ static const char* TAG = "ComfortzoneHeatpump";
 
 comfortzone_heatpump::comfortzone_heatpump(esphome::uart::UARTDevice* uart_device, int de_pin) : rs485(uart_device), de_pin(de_pin)
 {
+}
+
+void comfortzone_heatpump::setup() {
 	gpio_set_direction((gpio_num_t)de_pin, GPIO_MODE_OUTPUT);
 	gpio_set_level((gpio_num_t)de_pin, 0);
 }
@@ -214,7 +217,13 @@ bool comfortzone_heatpump::set_fan_speed(uint8_t fan_speed, int timeout)
 	{
 		// on success, immediatly update status cache. Without this, if status cache is sent to client
 		// before receiving update from heatpump, an incorrect value is returned
-		comfortzone_status.fan_speed = fan_speed;
+		if(fan_speed == 1) {
+			comfortzone_status.fan_speed->publish_state("low");
+		} else if(fan_speed == 2) {
+			comfortzone_status.fan_speed->publish_state("normal");
+		} else if(fan_speed == 3) {
+			comfortzone_status.fan_speed->publish_state("fast");
+		}
 	}
 
 	return push_result;
@@ -254,7 +263,7 @@ bool comfortzone_heatpump::set_room_temperature(float room_temp, int timeout)
 	{
 		// on success, immediatly update status cache. Without this, if status cache is sent to client
 		// before receiving update from heatpump, an incorrect value is returned
-		comfortzone_status.room_heating_setting = int_value;
+		comfortzone_status.room_heating_setting->publish_state(int_value);
 	}
 
 	return push_result;
@@ -295,7 +304,7 @@ bool comfortzone_heatpump::set_hot_water_temperature(float hot_water_temp, int t
 	{
 		// on success, immediatly update status cache. Without this, if status cache is sent to client
 		// before receiving update from heatpump, an incorrect value is returned
-		comfortzone_status.hot_water_setting = int_value;
+		comfortzone_status.hot_water_setting->publish_state(int_value / 10.0);
 	}
 
 	return push_result;
@@ -332,7 +341,7 @@ bool comfortzone_heatpump::set_led_luminosity(uint8_t led_level, int timeout)
 	{
 		// on success, immediatly update status cache. Without this, if status cache is sent to client
 		// before receiving update from heatpump, an incorrect value is returned
-		comfortzone_status.led_luminosity_setting = led_level;
+		comfortzone_status.led_luminosity_setting->publish_state(led_level);
 	}
 
 	return push_result;
@@ -564,7 +573,7 @@ bool comfortzone_heatpump::set_extra_hot_water(bool enable, int timeout)
 	{
 		// on success, immediatly update status cache. Without this, if status cache is sent to client
 		// before receiving update from heatpump, an incorrect value is returned
-		comfortzone_status.extra_hot_water_setting = enable;
+		comfortzone_status.extra_hot_water_setting->publish_state(enable);
 	}
 
 	return push_result;

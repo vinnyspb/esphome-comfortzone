@@ -43,6 +43,8 @@ class comfortzone_heatpump
 
 	comfortzone_heatpump(esphome::uart::UARTDevice* uart_device, int de_pin);
 
+	void setup();
+
 	// Function to call periodically to manage rs485 serial input
 	PROCESSED_FRAME_TYPE process();
 	
