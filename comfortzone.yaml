@@ -89,6 +89,7 @@ sensor:
     - name: "Current compressor total power"
       unit_of_measurement: W
     - name: "Current compressor input power"
+      id: current_compressor_input_power
       unit_of_measurement: W
     - name: "Compressor energy"
       unit_of_measurement: kWh
@@ -112,6 +113,9 @@ sensor:
     - name: "Hot water calculated setting"
       unit_of_measurement: °C
       accuracy_decimals: 1
+- platform: total_daily_energy
+  name: "Total Daily Input Energy"
+  power_id: current_compressor_input_power
 
 binary_sensor:
   - platform: custom
@@ -143,6 +147,10 @@ text_sensor:
       - name: "Mode"
       - name: "Fan speed"
       - name: "Hot water priority setting"
+
+time:
+  - platform: sntp
+    id: sntp_time
 
 # Enable logging
 logger:
