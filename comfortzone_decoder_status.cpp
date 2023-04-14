@@ -10,7 +10,7 @@ static const char* TAG = "ComfortzoneDecoderStatus";
 
 static void dump_unknown(const char *prefix, byte *start, int length)
 {
-	ESP_LOGD(TAG, "%s : ", prefix);
+	ESP_LOGV(TAG, "%s : ", prefix);
 	ESP_LOG_BUFFER_HEXDUMP(TAG, start, length, ESP_LOG_DEBUG);
 }
 
@@ -32,7 +32,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->extra_hot_water;
 
-	ESP_LOGD(TAG, "Extra hot water: %s (%0X)", (reg_v == 0xFF) ? "off" : "on", reg_v);
+	ESP_LOGV(TAG, "Extra hot water: %s (%0X)", (reg_v == 0xFF) ? "off" : "on", reg_v);
 	
 	// ===
 	reg_v = get_uint16(q->hot_water_user_setting);
@@ -40,7 +40,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Hot water User setting: %f °C", reg_v_f);
+	ESP_LOGV(TAG, "Hot water User setting: %f °C", reg_v_f);
 
 	// ===
 	reg_v = get_uint16(q->hot_water_hysteresis);
@@ -48,7 +48,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Hot water - hysteresis: %f °C", reg_v_f);
+	ESP_LOGV(TAG, "Hot water - hysteresis: %f °C", reg_v_f);
 
 	// ===
 	for(i = 0; i < STATUS_01_NB_HW_NORMAL_STEPS; i++)
@@ -58,7 +58,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "Hot water - Normal step %d: %f °C", i, reg_v_f);
+		ESP_LOGV(TAG, "Hot water - Normal step %d: %f °C", i, reg_v_f);
 	}
 
 	// ===
@@ -69,7 +69,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "Hot water - High step %d: %f °C", i, reg_v_f);
+		ESP_LOGV(TAG, "Hot water - High step %d: %f °C", i, reg_v_f);
 	}
 	
 	// ===
@@ -80,7 +80,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "Hot water - Additional step %d: %f °C", i, reg_v_f);
+		ESP_LOGV(TAG, "Hot water - Additional step %d: %f °C", i, reg_v_f);
 	}
 	
 	// ===
@@ -89,12 +89,12 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->hot_water_max_runtime;
 
-	ESP_LOGD(TAG, "Hot water max runtime: %d min", reg_v);
+	ESP_LOGV(TAG, "Hot water max runtime: %d min", reg_v);
 
 	// ===
 	reg_v = q->hot_water_pause_time;
 
-	ESP_LOGD(TAG, "Hot water pause duration: %d min", reg_v);
+	ESP_LOGV(TAG, "Hot water pause duration: %d min", reg_v);
 	
 	// ===
 	for(i = 0; i < 8; i++)
@@ -103,7 +103,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 
 		reg_v_f = reg_v;
 
-		ESP_LOGD(TAG, "unknown_s01_5b[%d]: %f?", i, reg_v_f);
+		ESP_LOGV(TAG, "unknown_s01_5b[%d]: %f?", i, reg_v_f);
 	}
 
 
@@ -113,7 +113,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Hot water - compressor min freq.: %f Hz", reg_v_f);
+	ESP_LOGV(TAG, "Hot water - compressor min freq.: %f Hz", reg_v_f);
 
 	// ===
 	reg_v = get_uint16(q->hot_water_compressor_max_frequency);
@@ -121,7 +121,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Hot water - compressor max freq.: %f Hz", reg_v_f);
+	ESP_LOGV(TAG, "Hot water - compressor max freq.: %f Hz", reg_v_f);
 	
 	// ===
 	dump_unknown("unknown_s01_6", q->unknown6, sizeof(q->unknown6));
@@ -132,12 +132,12 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Hot water - extra setting: %f °C", reg_v_f);
+	ESP_LOGV(TAG, "Hot water - extra setting: %f °C", reg_v_f);
 
 	// ===
 	reg_v = get_uint16(q->hot_water_extra_time);
 
-	ESP_LOGD(TAG, "Hot water - extra time: %d min", reg_v);
+	ESP_LOGV(TAG, "Hot water - extra time: %d min", reg_v);
 
 	// ===
 	dump_unknown("unknown_s01_7", q->unknown7, sizeof(q->unknown7));
@@ -148,7 +148,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Normal fan speed: %f %%", reg_v_f);
+	ESP_LOGV(TAG, "Normal fan speed: %f %%", reg_v_f);
 
 	// ===
 	reg_v = get_int16(q->reduce_fan_speed);
@@ -156,7 +156,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Reduce fan speed: %f %%", reg_v_f);
+	ESP_LOGV(TAG, "Reduce fan speed: %f %%", reg_v_f);
 
 	// ===
 	reg_v = get_int16(q->fan_boost_increase);
@@ -164,7 +164,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Fan boost increase: %f %%", reg_v_f);
+	ESP_LOGV(TAG, "Fan boost increase: %f %%", reg_v_f);
 
 	// ===
 	dump_unknown("unknown_s01_8", q->unknown8, sizeof(q->unknown8));
@@ -175,7 +175,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Supply fan T12 adjust: %f %%", reg_v_f);
+	ESP_LOGV(TAG, "Supply fan T12 adjust: %f %%", reg_v_f);
 
 	// ===
 	dump_unknown("unknown_s01_8a", q->unknown8a, sizeof(q->unknown8a));
@@ -183,7 +183,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = get_uint16(q->fan_time_to_filter_change);
 
-	ESP_LOGD(TAG, "Fan - Time to filter change: %d days", reg_v);
+	ESP_LOGV(TAG, "Fan - Time to filter change: %d days", reg_v);
 
 	// ===
 	dump_unknown("unknown_s01_9", q->unknown9, sizeof(q->unknown9));
@@ -194,7 +194,7 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heating compressor min freq.: %f Hz", reg_v_f);
+	ESP_LOGV(TAG, "Heating compressor min freq.: %f Hz", reg_v_f);
 
 	// ===
 	reg_v = get_uint16(q->heating_compressor_max_frequency);
@@ -202,12 +202,12 @@ void czdec::reply_r_status_01(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heating compressor max freq.: %f Hz", reg_v_f);
+	ESP_LOGV(TAG, "Heating compressor max freq.: %f Hz", reg_v_f);
 
 	// ===
 	dump_unknown("unknown_s01_9a", q->unknown9a, sizeof(q->unknown9a));
 
-	ESP_LOGD(TAG, "crc: %0X", q->crc);
+	ESP_LOGV(TAG, "crc: %0X", q->crc);
 }
 
 void czdec::reply_r_status_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_REPLY *p)
@@ -346,35 +346,35 @@ void czdec::reply_r_status_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	dump_unknown("unknown_s02", q->unknown, sizeof(q->unknown));
 
 	// ===
-	ESP_LOGD(TAG, "Time1: ");
-	ESP_LOGD(TAG, q->hour1);
-	ESP_LOGD(TAG, ":");
-	ESP_LOGD(TAG, q->minute1);
-	ESP_LOGD(TAG, ":");
-	ESP_LOGD(TAG, q->second1);
-	ESP_LOGD(TAG, );
+	ESP_LOGV(TAG, "Time1: ");
+	ESP_LOGV(TAG, q->hour1);
+	ESP_LOGV(TAG, ":");
+	ESP_LOGV(TAG, q->minute1);
+	ESP_LOGV(TAG, ":");
+	ESP_LOGV(TAG, q->second1);
+	ESP_LOGV(TAG, );
 
 	// ===
-	ESP_LOGD(TAG, "Day: ");
-	ESP_LOGD(TAG, q->day);
-	ESP_LOGD(TAG, "/");
-	ESP_LOGD(TAG, q->month);
-	ESP_LOGD(TAG, "/");
-	ESP_LOGD(TAG, q->year + 2000);
-	ESP_LOGD(TAG, );
+	ESP_LOGV(TAG, "Day: ");
+	ESP_LOGV(TAG, q->day);
+	ESP_LOGV(TAG, "/");
+	ESP_LOGV(TAG, q->month);
+	ESP_LOGV(TAG, "/");
+	ESP_LOGV(TAG, q->year + 2000);
+	ESP_LOGV(TAG, );
 
 	// ===
-	ESP_LOGD(TAG, "Day of week: ");
-	ESP_LOGD(TAG, q->day_of_week);
+	ESP_LOGV(TAG, "Day of week: ");
+	ESP_LOGV(TAG, q->day_of_week);
 
 	// ===
-	ESP_LOGD(TAG, "Time2: ");
-	ESP_LOGD(TAG, q->hour2);
-	ESP_LOGD(TAG, ":");
-	ESP_LOGD(TAG, q->minute2);
-	ESP_LOGD(TAG, ":");
-	ESP_LOGD(TAG, q->second2);
-	ESP_LOGD(TAG, );
+	ESP_LOGV(TAG, "Time2: ");
+	ESP_LOGV(TAG, q->hour2);
+	ESP_LOGV(TAG, ":");
+	ESP_LOGV(TAG, q->minute2);
+	ESP_LOGV(TAG, ":");
+	ESP_LOGV(TAG, q->second2);
+	ESP_LOGV(TAG, );
 
 	// ===
 	dump_unknown("unknown_s02_3", q->unknown3, sizeof(q->unknown3));
@@ -383,90 +383,90 @@ void czdec::reply_r_status_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	dump_unknown("unknown_general_status", q->general_status, sizeof(q->general_status));
 
 	// ===
-	ESP_LOGD(TAG, "Add energy: ");
-	ESP_LOGD(TAG,  (q->general_status[0] & 0x20) ? "on" : "off");
+	ESP_LOGV(TAG, "Add energy: ");
+	ESP_LOGV(TAG,  (q->general_status[0] & 0x20) ? "on" : "off");
 
-	ESP_LOGD(TAG, "Mode (1): ");
+	ESP_LOGV(TAG, "Mode (1): ");
 	switch(q->general_status[0] & 0x3)
 	{
-		case 0:	ESP_LOGD(TAG, "Heating");
+		case 0:	ESP_LOGV(TAG, "Heating");
 					break;
-		case 1:	ESP_LOGD(TAG, "1?");
+		case 1:	ESP_LOGV(TAG, "1?");
 					break;
-		case 2:	ESP_LOGD(TAG, "2?");
+		case 2:	ESP_LOGV(TAG, "2?");
 					break;
-		case 3:	ESP_LOGD(TAG, "Hot water");
+		case 3:	ESP_LOGV(TAG, "Hot water");
 					break;
 	}
 
-	ESP_LOGD(TAG, "Heatpump activity: ");
+	ESP_LOGV(TAG, "Heatpump activity: ");
 	switch((q->general_status[1]>>4) & 0x3)
 	{
-		case 0:	ESP_LOGD(TAG, "Stopped ?");
+		case 0:	ESP_LOGV(TAG, "Stopped ?");
 					break;
-		case 1:	ESP_LOGD(TAG, "Stopped");
+		case 1:	ESP_LOGV(TAG, "Stopped");
 					break;
-		case 2:	ESP_LOGD(TAG, "Running");
+		case 2:	ESP_LOGV(TAG, "Running");
 					break;
-		case 3:	ESP_LOGD(TAG, "Stopping");
+		case 3:	ESP_LOGV(TAG, "Stopping");
 					break;
 	}
 
-	ESP_LOGD(TAG, "Mode (2): ");
+	ESP_LOGV(TAG, "Mode (2): ");
 	switch((q->general_status[1]>>1) & 0x3)
 	{
-		case 0:	ESP_LOGD(TAG, "Idle");
+		case 0:	ESP_LOGV(TAG, "Idle");
 					break;
-		case 1:	ESP_LOGD(TAG, "Heating");
+		case 1:	ESP_LOGV(TAG, "Heating");
 					break;
-		case 2:	ESP_LOGD(TAG, "2?");
+		case 2:	ESP_LOGV(TAG, "2?");
 					break;
-		case 3:	ESP_LOGD(TAG, "Hot water");
+		case 3:	ESP_LOGV(TAG, "Hot water");
 					break;
 	}
 
-	ESP_LOGD(TAG, "Defrost: ");
-	ESP_LOGD(TAG,  (q->general_status[4] & 0x04) ? "on" : "off");
+	ESP_LOGV(TAG, "Defrost: ");
+	ESP_LOGV(TAG,  (q->general_status[4] & 0x04) ? "on" : "off");
 
 	// ===
 	dump_unknown("unknown_s02_3b", q->unknown3b, sizeof(q->unknown3b));
 
 	// ===
 	reg_v = get_uint16(q->pending_alarm);
-	ESP_LOGD(TAG, "Pending alarm: ");
+	ESP_LOGV(TAG, "Pending alarm: ");
 
 	if(reg_v & 0x0002)
 	{
-		ESP_LOGD(TAG, "filter ");
+		ESP_LOGV(TAG, "filter ");
 	}
 
 	if(reg_v & ~0x0002)
 	{
-		ESP_LOGD(TAG, "(0x");
-		ESP_LOGD(TAG, reg_v);
-		ESP_LOGD(TAG, ")");
+		ESP_LOGV(TAG, "(0x");
+		ESP_LOGV(TAG, reg_v);
+		ESP_LOGV(TAG, ")");
 	}
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	dump_unknown("unknown_s02_3c", q->unknown3c, sizeof(q->unknown3c));
 
 	// ===
 	reg_v = get_uint16(q->acknowledged_alarm);
-	ESP_LOGD(TAG, "Acknowledged alarm: ");
+	ESP_LOGV(TAG, "Acknowledged alarm: ");
 
 	if(reg_v & 0x0002)
 	{
-		ESP_LOGD(TAG, "filter ");
+		ESP_LOGV(TAG, "filter ");
 	}
 
 	if(reg_v & ~0x0002)
 	{
-		ESP_LOGD(TAG, "(0x");
-		ESP_LOGD(TAG, reg_v);
-		ESP_LOGD(TAG, ")");
+		ESP_LOGV(TAG, "(0x");
+		ESP_LOGV(TAG, reg_v);
+		ESP_LOGV(TAG, ")");
 	}
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	dump_unknown("unknown_s02_3d", q->unknown3d, sizeof(q->unknown3d));
@@ -482,32 +482,32 @@ void czdec::reply_r_status_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "Sensor - ");
-		ESP_LOGD(TAG, sensor_names[i]);
-		ESP_LOGD(TAG, ": ");
+		ESP_LOGV(TAG, "Sensor - ");
+		ESP_LOGV(TAG, sensor_names[i]);
+		ESP_LOGV(TAG, ": ");
 
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C (0x");
-		ESP_LOGD(TAG, reg_v, HEX);
-		ESP_LOGD(TAG, " 0x");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C (0x");
+		ESP_LOGV(TAG, reg_v, HEX);
+		ESP_LOGV(TAG, " 0x");
 
 		if(q->sensors[i][0] < 0x10)
-			ESP_LOGD(TAG, "0");
-		ESP_LOGD(TAG, q->sensors[i][0], HEX);
+			ESP_LOGV(TAG, "0");
+		ESP_LOGV(TAG, q->sensors[i][0], HEX);
 
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, " ");
 		if(q->sensors[i][1] < 0x10)
-			ESP_LOGD(TAG, "0");
-		ESP_LOGD(TAG, q->sensors[i][1], HEX);
+			ESP_LOGV(TAG, "0");
+		ESP_LOGV(TAG, q->sensors[i][1], HEX);
 
-		ESP_LOGD(TAG, ")");
+		ESP_LOGV(TAG, ")");
 	}
 
 	// ===
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -522,10 +522,10 @@ void czdec::reply_r_status_03(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	dump_unknown("unknown_s03", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -543,9 +543,9 @@ void czdec::reply_r_status_04(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = get_uint16(q->chauffage_puissance_consommee1);
 
-	ESP_LOGD(TAG, "Chauffage - Puissance consommée 1: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "W");
+	ESP_LOGV(TAG, "Chauffage - Puissance consommée 1: ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "W");
 
 	// ===
 	dump_unknown("unknown_s04_8", q->unknown8, sizeof(q->unknown8));
@@ -553,30 +553,30 @@ void czdec::reply_r_status_04(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = get_uint16(q->chauffage_puissance_consommee2);
 
-	ESP_LOGD(TAG, "Chauffage - Puissance consommée 2: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "W");
+	ESP_LOGV(TAG, "Chauffage - Puissance consommée 2: ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "W");
 
 	// ===
 	reg_v = q->hot_water_production;
 
-	ESP_LOGD(TAG, "Hot water in progress (s4): ");
+	ESP_LOGV(TAG, "Hot water in progress (s4): ");
 	if(reg_v == 0x00)
-		ESP_LOGD(TAG, "no");
+		ESP_LOGV(TAG, "no");
 	else if(reg_v == 0x77)
-		ESP_LOGD(TAG, "yes (0x77)");
+		ESP_LOGV(TAG, "yes (0x77)");
 	else if(reg_v == 0x78)
-		ESP_LOGD(TAG, "yes (0x78)");
+		ESP_LOGV(TAG, "yes (0x78)");
 	else
-		ESP_LOGD(TAG, reg_v, HEX);
+		ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	dump_unknown("unknown_s04_9", q->unknown9, sizeof(q->unknown9));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -614,15 +614,15 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->hot_water_production;
 
-	ESP_LOGD(TAG, "Hot water in progress (s5): ");
+	ESP_LOGV(TAG, "Hot water in progress (s5): ");
 	if(reg_v == 0x00)
-		ESP_LOGD(TAG, "no");
+		ESP_LOGV(TAG, "no");
 	else if(reg_v == 0x77)
-		ESP_LOGD(TAG, "yes (0x77)");
+		ESP_LOGV(TAG, "yes (0x77)");
 	else if(reg_v == 0x78)
-		ESP_LOGD(TAG, "yes (0x78)");
+		ESP_LOGV(TAG, "yes (0x78)");
 	else
-		ESP_LOGD(TAG, reg_v, HEX);
+		ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	dump_unknown("unknown_s05a", q->unknown, sizeof(q->unknown));
@@ -633,14 +633,14 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heating - Calculated setting: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Heating - Calculated setting: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 	
 	// ===
 	dump_unknown("unknown_s05_02", q->unknown0, sizeof(q->unknown0));
 
-	ESP_LOGD(TAG, "TE3 Indoor temp history (new values first, 1 value = 10seconds): ");
+	ESP_LOGV(TAG, "TE3 Indoor temp history (new values first, 1 value = 10seconds): ");
 	// ===
 	for(i = 0; i < STATUS_05_TE3_INDOOR_TEMP_HISTORY_NB; i++)
 	{
@@ -649,13 +649,13 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C ");
 	}
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
-	ESP_LOGD(TAG, "TE2 Return water history (new values first, 1 value = 10seconds): ");
+	ESP_LOGV(TAG, "TE2 Return water history (new values first, 1 value = 10seconds): ");
 	for(i = 0; i < STATUS_05_TE2_RETURN_WATER_HISTORY_NB; i++)
 	{
 		reg_v = get_int16(q->te2_return_water_history[i]);
@@ -663,24 +663,24 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C ");
 	}
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	reg_v = get_uint16(q->room_heating_in_progress);
 
-	ESP_LOGD(TAG, "Room heating in progress: ");
+	ESP_LOGV(TAG, "Room heating in progress: ");
 	if(reg_v == 0x012C)
 	{
-		ESP_LOGD(TAG, "no (0x012C)");
+		ESP_LOGV(TAG, "no (0x012C)");
 	}
 	else
 	{
-		ESP_LOGD(TAG, "yes (0x");
-		ESP_LOGD(TAG, reg_v, HEX);
-		ESP_LOGD(TAG, ")");
+		ESP_LOGV(TAG, "yes (0x");
+		ESP_LOGV(TAG, reg_v, HEX);
+		ESP_LOGV(TAG, ")");
 	}
 
 	// ===
@@ -692,9 +692,9 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Hot water Calculated setting (s05): ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Hot water Calculated setting (s05): ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	dump_unknown("unknown_s05_2", q->unknown2, sizeof(q->unknown2));
@@ -702,9 +702,9 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = get_uint16(q->unknown_count_down);
 
-	ESP_LOGD(TAG, "s05 - unknown count down (seems to be hot water remaining runtime. 0x00 00 when not running else count down from hotwater max runtime): ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "seconds");
+	ESP_LOGV(TAG, "s05 - unknown count down (seems to be hot water remaining runtime. 0x00 00 when not running else count down from hotwater max runtime): ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "seconds");
 	
 	// ===
 	dump_unknown("unknown_s05_2b", q->unknown2b, sizeof(q->unknown2b));
@@ -712,13 +712,13 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->extra_hot_water;
 
-	ESP_LOGD(TAG, "Extra hot water (s05): ");
+	ESP_LOGV(TAG, "Extra hot water (s05): ");
 	if(reg_v == 0x00)
-		ESP_LOGD(TAG, "off");
+		ESP_LOGV(TAG, "off");
 	else if(reg_v == 0x0F)
-		ESP_LOGD(TAG, "on");
+		ESP_LOGV(TAG, "on");
 	else
-		ESP_LOGD(TAG, reg_v, HEX);
+		ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	dump_unknown("unknown_s05_2c", q->unknown2c, sizeof(q->unknown2c));
@@ -726,15 +726,15 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->fan_speed;
 
-	ESP_LOGD(TAG, "Fan speed: ");
+	ESP_LOGV(TAG, "Fan speed: ");
 	if(reg_v == 0x01)
-		ESP_LOGD(TAG, "low");
+		ESP_LOGV(TAG, "low");
 	else if(reg_v == 0x02)
-		ESP_LOGD(TAG, "normal");
+		ESP_LOGV(TAG, "normal");
 	else if(reg_v == 0x03)
-		ESP_LOGD(TAG, "high");
+		ESP_LOGV(TAG, "high");
 	else
-		ESP_LOGD(TAG, reg_v, HEX);
+		ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	dump_unknown("unknown_s05_3", q->unknown3, sizeof(q->unknown3));
@@ -745,9 +745,9 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Condensing temperature: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Condensing temperature: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	reg_v = get_uint16(q->condensing_pressure);
@@ -755,16 +755,16 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Condensing pressure: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "bar");
+	ESP_LOGV(TAG, "Condensing pressure: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "bar");
 
 	// ===
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -793,7 +793,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Evaporator pressure: %f bar", reg_v_f);
+// 	ESP_LOGV(TAG, "Evaporator pressure: %f bar", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_uint16(q->pressure_ratio);
@@ -801,7 +801,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Pressure ratio: %f", reg_v_f);
+// 	ESP_LOGV(TAG, "Pressure ratio: %f", reg_v_f);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_0a", q->unknown0a, sizeof(q->unknown0a));
@@ -813,7 +813,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f /= 10.0;
 
 // 	// not real max as it changes autonomously
-// 	ESP_LOGD(TAG, "Heatpump - Compressor max frequency (1) (erroneous): %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Heatpump - Compressor max frequency (1) (erroneous): %f Hz", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_uint16(q->hot_water_active_max_frequency);
@@ -822,7 +822,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f /= 10.0;
 
 // 	// not real max as it changes autonomously
-// 	ESP_LOGD(TAG, "Hot water - Compressor active max frequency: %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Hot water - Compressor active max frequency: %f Hz", reg_v_f);
 
 // 	// ===
 // 	// During defrost, forced to 0Hz else set to heating compressor max frequency
@@ -831,7 +831,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (1): %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (1): %f Hz", reg_v_f);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_0c", q->unknown0c, sizeof(q->unknown0c));
@@ -842,7 +842,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (2): %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (2): %f Hz", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_uint16(q->heatpump_active_max_frequency3);
@@ -850,7 +850,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (3): %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Heatpump - Compressor active max frequency (during defrost, set to 0Hz else real compressor max frequency) (3): %f Hz", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_uint16(q->heatpump_current_compressor_frequency);
@@ -858,7 +858,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Heatpump - current compressor frequency: %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Heatpump - current compressor frequency: %f Hz", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_uint16(q->chauffage_compressor_max_frequency3);
@@ -866,7 +866,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Chauffage - Compressor max frequency (3): %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Chauffage - Compressor max frequency (3): %f Hz", reg_v_f);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_0d", q->unknown0d, sizeof(q->unknown0d));
@@ -877,7 +877,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Heating - Compressor min frequency: %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Heating - Compressor min frequency: %f Hz", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_uint16(q->heating_compressor_max_frequency);
@@ -885,7 +885,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v_f = reg_v;
 // 	reg_v_f /= 10.0;
 
-// 	ESP_LOGD(TAG, "Heating - Compressor max frequency: %f Hz", reg_v_f);
+// 	ESP_LOGV(TAG, "Heating - Compressor max frequency: %f Hz", reg_v_f);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_0", q->unknown0, sizeof(q->unknown0));
@@ -893,27 +893,27 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	// ===
 // 	reg_v = get_uint16(q->heatpump_current_compressor_power);
 
-// 	ESP_LOGD(TAG, "Heatpump - current compressor power: %d W", reg_v);
+// 	ESP_LOGV(TAG, "Heatpump - current compressor power: %d W", reg_v);
 
 // 	// ===
 // 	reg_v = get_uint16(q->heatpump_current_add_power);
 
-// 	ESP_LOGD(TAG, "Heatpump - current add power: %d W", reg_v);
+// 	ESP_LOGV(TAG, "Heatpump - current add power: %d W", reg_v);
 
 // 	// ===
 // 	reg_v = get_uint16(q->heatpump_current_total_power1);
 
-// 	ESP_LOGD(TAG, "Heatpump - current total power 1: %d W", reg_v);
+// 	ESP_LOGV(TAG, "Heatpump - current total power 1: %d W", reg_v);
 
 // 	// ===
 // 	reg_v = get_uint16(q->heatpump_current_total_power2);
 
-// 	ESP_LOGD(TAG, "Heatpump - current total power 2: %d W", reg_v);
+// 	ESP_LOGV(TAG, "Heatpump - current total power 2: %d W", reg_v);
 
 // 	// ===
 // 	reg_v = get_uint16(q->heatpump_compressor_input_power);
 
-// 	ESP_LOGD(TAG, "Heatpump - Compressor input power: %d W", reg_v);
+// 	ESP_LOGV(TAG, "Heatpump - Compressor input power: %d W", reg_v);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_1a", q->unknown1a, sizeof(q->unknown1a));
@@ -921,7 +921,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	// ===
 // 	reg_v = get_uint16(q->unknown_count_down);
 
-// 	ESP_LOGD(TAG, "Heatpump - remaining min runtime (?): %d seconds", reg_v);
+// 	ESP_LOGV(TAG, "Heatpump - remaining min runtime (?): %d seconds", reg_v);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_1b", q->unknown1b, sizeof(q->unknown1b));
@@ -929,7 +929,7 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	// ===
 // 	reg_v = get_uint16(q->heatpump_defrost_delay);
 
-// 	ESP_LOGD(TAG, "Heatpump - remaining time to next defrost (=remaining max runtime): %d seconds", reg_v);
+// 	ESP_LOGV(TAG, "Heatpump - remaining time to next defrost (=remaining max runtime): %d seconds", reg_v);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_2", q->unknown2, sizeof(q->unknown2));
@@ -938,25 +938,25 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v = get_uint16(q->expansion_valve_calculated_setting);
 // 	reg_v_f = reg_v / 10;
 
-// 	ESP_LOGD(TAG, "Expansion valve - Calculated setting: %f K", reg_v_f);
+// 	ESP_LOGV(TAG, "Expansion valve - Calculated setting: %f K", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_int16(q->vanne_expansion_xxx);
 // 	reg_v_f = reg_v / 10;
 
-// 	ESP_LOGD(TAG, "Vanne expansion - xxx?: %f K", reg_v_f);
+// 	ESP_LOGV(TAG, "Vanne expansion - xxx?: %f K", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_int16(q->expansion_valve_temperature_difference1);
 // 	reg_v_f = reg_v / 10;
 
-// 	ESP_LOGD(TAG, "Expansion valve - Temperature difference 1: %f K", reg_v_f);
+// 	ESP_LOGV(TAG, "Expansion valve - Temperature difference 1: %f K", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_int16(q->expansion_valve_temperature_difference2);
 // 	reg_v_f = reg_v / 10;
 
-// 	ESP_LOGD(TAG, "Expansion valve - Temperature difference 2: %f K", reg_v_f);
+// 	ESP_LOGV(TAG, "Expansion valve - Temperature difference 2: %f K", reg_v_f);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_2a", q->unknown2a, sizeof(q->unknown2a));
@@ -965,18 +965,18 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	reg_v = get_uint16(q->expansion_valve_valve_position1);
 // 	reg_v_f = reg_v / 10;
 
-// 	ESP_LOGD(TAG, "Expansion valve - Valve position 1: %f %%", reg_v_f);
+// 	ESP_LOGV(TAG, "Expansion valve - Valve position 1: %f %%", reg_v_f);
 
 // 	// ===
 // 	reg_v = get_uint16(q->expansion_valve_valve_position1);
 // 	reg_v_f = reg_v / 10;
 
-// 	ESP_LOGD(TAG, "Expansion valve - Valve position 2: %f %%", reg_v_f);
+// 	ESP_LOGV(TAG, "Expansion valve - Valve position 2: %f %%", reg_v_f);
 
 // 	// ===
 // 	dump_unknown("unknown_s06_2a", q->unknown2a, sizeof(q->unknown2a));
 
-// 	ESP_LOGD(TAG, "crc: %0X", q->crc);
+// 	ESP_LOGV(TAG, "crc: %0X", q->crc);
 // }
 
 // void czdec::reply_r_status_07(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_REPLY *p)
@@ -993,17 +993,17 @@ void czdec::reply_r_status_05(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 // 	// ===
 // 	reg_v = get_uint16(q->input_power_limit);
 
-// 	ESP_LOGD(TAG, "Input power limit: ");
-// 	ESP_LOGD(TAG, reg_v);
-// 	ESP_LOGD(TAG, "W");
+// 	ESP_LOGV(TAG, "Input power limit: ");
+// 	ESP_LOGV(TAG, reg_v);
+// 	ESP_LOGV(TAG, "W");
 
 // 	// ===
 // 	dump_unknown("unknown_s07_2", q->unknown2, sizeof(q->unknown2));
 
-// 	ESP_LOGD(TAG, "crc: ");
+// 	ESP_LOGV(TAG, "crc: ");
 // 	if(q->crc < 0x10)
-// 		ESP_LOGD(TAG, "0");
-// 	ESP_LOGD(TAG, q->crc, HEX);
+// 		ESP_LOGV(TAG, "0");
+// 	ESP_LOGV(TAG, q->crc, HEX);
 // #endif
 // }
 
@@ -1025,20 +1025,20 @@ void czdec::reply_r_status_08(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->bcd_second;
 
-	ESP_LOGD(TAG, "Second (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Second (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	reg_v = q->bcd_minute;
 
-	ESP_LOGD(TAG, "Minute (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Minute (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	reg_v = q->bcd_hour;
 
-	ESP_LOGD(TAG, "Hour (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Hour (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	dump_unknown("unknown_s08_0 (increase by 1 every day but it is not day of week)", &(q->unknown0), sizeof(q->unknown0));
@@ -1046,20 +1046,20 @@ void czdec::reply_r_status_08(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->bcd_day;
 
-	ESP_LOGD(TAG, "Day (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Day (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	reg_v = q->bcd_month;
 
-	ESP_LOGD(TAG, "Month (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Month (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	reg_v = q->bcd_year;
 
-	ESP_LOGD(TAG, "Year (BCD)(20xx): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Year (BCD)(20xx): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	dump_unknown("unknown_s08_0a", q->unknown0a, sizeof(q->unknown0a));
@@ -1073,9 +1073,9 @@ void czdec::reply_r_status_08(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 100.0;
 
-	ESP_LOGD(TAG, "Compressor energy: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "kWh");
+	ESP_LOGV(TAG, "Compressor energy: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "kWh");
 
 	// ===
 	reg_v = get_uint32(q->add_energy);
@@ -1083,9 +1083,9 @@ void czdec::reply_r_status_08(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 100.0;
 
-	ESP_LOGD(TAG, "Add energy: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "kWh");
+	ESP_LOGV(TAG, "Add energy: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "kWh");
 
 	// ===
 	reg_v = get_uint32(q->hot_water_energy);
@@ -1093,39 +1093,39 @@ void czdec::reply_r_status_08(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 100.0;
 
-	ESP_LOGD(TAG, "Hot water energy: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "kWh");
+	ESP_LOGV(TAG, "Hot water energy: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "kWh");
 
 	// ===
 	reg_v = get_uint32(q->compressor_runtime);
 
-	ESP_LOGD(TAG, "Compressor runtime: ");
-	ESP_LOGD(TAG, reg_v / 60);
-	ESP_LOGD(TAG, ":");
+	ESP_LOGV(TAG, "Compressor runtime: ");
+	ESP_LOGV(TAG, reg_v / 60);
+	ESP_LOGV(TAG, ":");
 	reg_v = reg_v % 60;
 	if(reg_v < 10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "");
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "");
 
 	// ===
 	reg_v = get_uint32(q->total_runtime);
 
-	ESP_LOGD(TAG, "Total runtime: ");
-	ESP_LOGD(TAG, reg_v / 60);
-	ESP_LOGD(TAG, ":");
+	ESP_LOGV(TAG, "Total runtime: ");
+	ESP_LOGV(TAG, reg_v / 60);
+	ESP_LOGV(TAG, ":");
 	reg_v = reg_v % 60;
 	if(reg_v < 10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "");
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "");
 
 	// ===
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1154,15 +1154,15 @@ void czdec::reply_r_status_09(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = get_uint16(q->hotwater_priority);
 
-	ESP_LOGD(TAG, "Hot water priority: ");
+	ESP_LOGV(TAG, "Hot water priority: ");
 	if(reg_v == 0x4151)
-		ESP_LOGD(TAG, "low");
+		ESP_LOGV(TAG, "low");
 	else if(reg_v == 0x4152)
-		ESP_LOGD(TAG, "normal");
+		ESP_LOGV(TAG, "normal");
 	else if(reg_v == 0x4153)
-		ESP_LOGD(TAG, "high");
+		ESP_LOGV(TAG, "high");
 	else
-		ESP_LOGD(TAG, reg_v, HEX);
+		ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	dump_unknown("unknown_s09_2", q->unknown2, sizeof(q->unknown2));
@@ -1175,27 +1175,27 @@ void czdec::reply_r_status_09(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "Hardware settings - Adjustments - TE");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, " Adjust: ");
+		ESP_LOGV(TAG, "Hardware settings - Adjustments - TE");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, " Adjust: ");
 
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C (0x");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C (0x");
 
 		if(reg_v < 0x10)
-			ESP_LOGD(TAG, "0");
-		ESP_LOGD(TAG, reg_v, HEX);
+			ESP_LOGV(TAG, "0");
+		ESP_LOGV(TAG, reg_v, HEX);
 
-		ESP_LOGD(TAG, ")");
+		ESP_LOGV(TAG, ")");
 	}
 
 	// ===
 	dump_unknown("unknown_s09_6", q->unknown6, sizeof(q->unknown6));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1218,9 +1218,9 @@ void czdec::reply_r_status_10(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Holiday temperature reduction: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Holiday temperature reduction: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	reg_v = get_uint16(q->holiday_minimal_room_temperature);
@@ -1228,9 +1228,9 @@ void czdec::reply_r_status_10(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "CW Minimal room temperature: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "CW Minimal room temperature: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	reg_v = get_uint16(q->cw_minimal_temperature);
@@ -1238,9 +1238,9 @@ void czdec::reply_r_status_10(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "CW Minimal temperature: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "CW Minimal temperature: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	reg_v = get_uint16(q->cw_maximal_temperature);
@@ -1248,9 +1248,9 @@ void czdec::reply_r_status_10(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "CW Maximal temperature: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "CW Maximal temperature: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	reg_v = get_uint16(q->cw_overheat_hysteresis);
@@ -1258,9 +1258,9 @@ void czdec::reply_r_status_10(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "CW overheat hysteresis: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "CW overheat hysteresis: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	// seems to never change
@@ -1272,9 +1272,9 @@ void czdec::reply_r_status_10(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "CW return maximal temperature: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "CW return maximal temperature: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	// seems to never change
@@ -1286,9 +1286,9 @@ void czdec::reply_r_status_10(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "CW pump: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "%");
+	ESP_LOGV(TAG, "CW pump: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "%");
 
 	// ===
 	dump_unknown("unknown_s10_2", q->unknown2, sizeof(q->unknown2));
@@ -1301,29 +1301,29 @@ void czdec::reply_r_status_10(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "Step-wise heating temperature ");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
+		ESP_LOGV(TAG, "Step-wise heating temperature ");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
 
 		reg_v_f = q->step_wise_heating_days[i];
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "Step-wise heating days ");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "day");
+		ESP_LOGV(TAG, "Step-wise heating days ");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "day");
 	}
 
 	// ===
 	dump_unknown("unknown_s10_3", q->unknown3, sizeof(q->unknown3));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1344,8 +1344,8 @@ void czdec::reply_r_status_11(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->led_luminosity;
 
-	ESP_LOGD(TAG, "Led luminosity: ");
-	ESP_LOGD(TAG, reg_v);
+	ESP_LOGV(TAG, "Led luminosity: ");
+	ESP_LOGV(TAG, reg_v);
 
 	// ===
 	// seems to never change
@@ -1354,23 +1354,23 @@ void czdec::reply_r_status_11(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = get_uint16(q->holiday_reduction);
 
-	ESP_LOGD(TAG, "Holiday reduction: ");
+	ESP_LOGV(TAG, "Holiday reduction: ");
 	if(reg_v == 0)
-		ESP_LOGD(TAG, "off");
+		ESP_LOGV(TAG, "off");
 	else
 	{
-		ESP_LOGD(TAG, reg_v);
-		ESP_LOGD(TAG, " day(s)");
+		ESP_LOGV(TAG, reg_v);
+		ESP_LOGV(TAG, " day(s)");
 	}
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_s11_3", q->unknown3, sizeof(q->unknown3));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1392,9 +1392,9 @@ void czdec::reply_r_status_12(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - compressor - blocked frequency 1: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "Hz");
+	ESP_LOGV(TAG, "Heatpump - compressor - blocked frequency 1: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "Hz");
 
 	// ===
 	reg_v = get_uint16(q->heatpump_compressor_blocked_frequency2);
@@ -1402,9 +1402,9 @@ void czdec::reply_r_status_12(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - compressor - blocked frequency 2: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "Hz");
+	ESP_LOGV(TAG, "Heatpump - compressor - blocked frequency 2: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "Hz");
 
 	// ===
 	reg_v = get_uint16(q->heatpump_compressor_blocked_frequency3);
@@ -1412,9 +1412,9 @@ void czdec::reply_r_status_12(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - compressor - blocked frequency 3: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "Hz");
+	ESP_LOGV(TAG, "Heatpump - compressor - blocked frequency 3: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "Hz");
 
 	// ===
 	dump_unknown("unknown_s12_3", q->unknown3, sizeof(q->unknown3));
@@ -1425,18 +1425,18 @@ void czdec::reply_r_status_12(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - defrost delay: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "min");
+	ESP_LOGV(TAG, "Heatpump - defrost delay: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "min");
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_s12_8", q->unknown8, sizeof(q->unknown8));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1452,10 +1452,10 @@ void czdec::reply_r_status_13(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// seems to never change
 	dump_unknown("unknown_s13", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1474,22 +1474,22 @@ void czdec::reply_r_status_14(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	reg_v = q->language;
 
-	ESP_LOGD(TAG, "Language: ");
+	ESP_LOGV(TAG, "Language: ");
 	if(reg_v == 0x01)
-		ESP_LOGD(TAG, "English");
+		ESP_LOGV(TAG, "English");
 	else if(reg_v == 0x04)
-		ESP_LOGD(TAG, "Français");
+		ESP_LOGV(TAG, "Français");
 	else
-		ESP_LOGD(TAG, reg_v, HEX);
+		ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_s14d", q->unknownd, sizeof(q->unknownd));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1505,10 +1505,10 @@ void czdec::reply_r_status_15(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// seems to never change
 	dump_unknown("unknown_s15", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1524,10 +1524,10 @@ void czdec::reply_r_status_16(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// seems to never change
 	dump_unknown("unknown_s16", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1543,10 +1543,10 @@ void czdec::reply_r_status_17(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// seems to never change
 	dump_unknown("unknown_s17", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1562,10 +1562,10 @@ void czdec::reply_r_status_18(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// seems to never change
 	dump_unknown("unknown_s18", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1581,10 +1581,10 @@ void czdec::reply_r_status_19(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// seems to always contain '\0'
 	dump_unknown("unknown_s19", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1600,10 +1600,10 @@ void czdec::reply_r_status_20(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// seems to always contain '\0'
 	dump_unknown("unknown_s20", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1618,10 +1618,10 @@ void czdec::reply_r_status_22(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	dump_unknown("unknown_s22", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1640,22 +1640,22 @@ void czdec::reply_r_status_23(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	{
 		reg_v = get_uint16(q->unknown1[i]);
 
-		ESP_LOGD(TAG, "S23 Unknown1 [");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, "]: ");
-		ESP_LOGD(TAG, reg_v);
-		ESP_LOGD(TAG, " (0x");
+		ESP_LOGV(TAG, "S23 Unknown1 [");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, "]: ");
+		ESP_LOGV(TAG, reg_v);
+		ESP_LOGV(TAG, " (0x");
 
 		if(((reg_v>>8)&0xFF) < 0x10)
-			ESP_LOGD(TAG, "0");
-		ESP_LOGD(TAG, (reg_v>>8)&0xFF), HEX);
+			ESP_LOGV(TAG, "0");
+		ESP_LOGV(TAG, (reg_v>>8)&0xFF), HEX);
 
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, " ");
 		if((reg_v & 0xFF) < 0x10)
-			ESP_LOGD(TAG, "0");
-		ESP_LOGD(TAG, reg_v & 0xFF), HEX);
+			ESP_LOGV(TAG, "0");
+		ESP_LOGV(TAG, reg_v & 0xFF), HEX);
 
-		ESP_LOGD(TAG, ")");
+		ESP_LOGV(TAG, ")");
 	}
 
 	// ===
@@ -1668,32 +1668,32 @@ void czdec::reply_r_status_23(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	{
 		reg_v = get_uint16(q->unknown2[i]);
 
-		ESP_LOGD(TAG, "S23 Unknown2 [");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, "]: ");
-		ESP_LOGD(TAG, reg_v);
-		ESP_LOGD(TAG, " (0x");
+		ESP_LOGV(TAG, "S23 Unknown2 [");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, "]: ");
+		ESP_LOGV(TAG, reg_v);
+		ESP_LOGV(TAG, " (0x");
 
 		if(((reg_v>>8)&0xFF) < 0x10)
-			ESP_LOGD(TAG, "0");
-		ESP_LOGD(TAG, (reg_v>>8)&0xFF), HEX);
+			ESP_LOGV(TAG, "0");
+		ESP_LOGV(TAG, (reg_v>>8)&0xFF), HEX);
 
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, " ");
 		if((reg_v & 0xFF) < 0x10)
-			ESP_LOGD(TAG, "0");
-		ESP_LOGD(TAG, reg_v & 0xFF), HEX);
+			ESP_LOGV(TAG, "0");
+		ESP_LOGV(TAG, reg_v & 0xFF), HEX);
 
-		ESP_LOGD(TAG, ")");
+		ESP_LOGV(TAG, ")");
 	}
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_s23_3", q->unknown3, sizeof(q->unknown3));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1708,10 +1708,10 @@ void czdec::reply_r_status_24(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// ===
 	dump_unknown("unknown_s24", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1727,10 +1727,10 @@ void czdec::reply_r_status_25(comfortzone_heatpump *czhp, KNOWN_REGISTER *kr, R_
 	// seems to never change
 	dump_unknown("unknown_s25", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1740,7 +1740,7 @@ void czdec::reply_r_status_v180_x58(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	R_REPLY_STATUS_V180_STATUS_x58 *q = (R_REPLY_STATUS_V180_STATUS_x58 *)p;
 
 	dump_unknown("RAW R_REPLY_STATUS_V180_STATUS_x58", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	//int reg_v;
 	//float reg_v_f;
@@ -1749,10 +1749,10 @@ void czdec::reply_r_status_v180_x58(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	// seems to never change
 	dump_unknown("unknown_v180_x58", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1762,7 +1762,7 @@ void czdec::reply_r_status_v180_x68(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	R_REPLY_STATUS_V180_STATUS_x68 *q = (R_REPLY_STATUS_V180_STATUS_x68 *)p;
 
 	dump_unknown("RAW R_REPLY_STATUS_V180_STATUS_x68", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	//int reg_v;
 	//float reg_v_f;
@@ -1787,10 +1787,10 @@ void czdec::reply_r_status_v180_x68(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	dump_unknown("unknown15_v180_x68", q->unknown15, sizeof(q->unknown15));
 	dump_unknown("unknown16_v180_x68", q->unknown16, sizeof(q->unknown16));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1806,7 +1806,7 @@ void czdec::reply_r_status_v180_x40(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	int i;
 
 	dump_unknown("RAW R_REPLY_STATUS_V180_STATUS_x40", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	reg_v = get_uint16(q->calculated_flow_set);
@@ -1814,9 +1814,9 @@ void czdec::reply_r_status_v180_x40(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Calculated flow set: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Calculated flow set: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	for(i = 0; i < STATUS_V180_x40_NB_TEMP; i++)
 	{
@@ -1825,12 +1825,12 @@ void czdec::reply_r_status_v180_x40(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "x40 ?Temp #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "x40 ?Temp #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp[i], 2);
 	}
 
@@ -1840,14 +1840,14 @@ void czdec::reply_r_status_v180_x40(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heating - Calculated setting: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Heating - Calculated setting: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1860,16 +1860,16 @@ void czdec::reply_r_status_v180_x26(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	//float reg_v_f;
 
 	dump_unknown("RAW R_REPLY_STATUS_V180_STATUS_x26", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_x26", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -1885,7 +1885,7 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	int i;
 
 	dump_unknown("RAW R_REPLY_STATUS_V180_STATUS_x8d", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	for(i = 0; i < STATUS_V180_x8d_NB_TEMP; i++)
 	{
@@ -1894,12 +1894,12 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "x8d_a ?Temp #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "x8d_a ?Temp #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp[i], 2);
 	}
 
@@ -1914,12 +1914,12 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "x8d_b ?Temp1 #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "x8d_b ?Temp1 #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp1[i], 2);
 	}
 
@@ -1929,9 +1929,9 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Normal fan speed: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "%");
+	ESP_LOGV(TAG, "Normal fan speed: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "%");
 
 	// ===
 	reg_v = get_int16(q->reduce_fan_speed);
@@ -1939,9 +1939,9 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Reduce fan speed: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "%");
+	ESP_LOGV(TAG, "Reduce fan speed: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "%");
 
 	// ===
 	reg_v = get_int16(q->fan_boost_increase);
@@ -1949,9 +1949,9 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Fan boost increase: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "%");
+	ESP_LOGV(TAG, "Fan boost increase: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "%");
 
 	// ===
 	for(i = 0; i < STATUS_V180_x8d_NB_TEMP1a; i++)
@@ -1961,21 +1961,21 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "x8d_b ?Temp1a #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "x8d_b ?Temp1a #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp1a[i], 2);
 	}
 
 	// ===
 	reg_v = get_uint16(q->fan_time_to_filter_change);
 
-	ESP_LOGD(TAG, "Fan - Time to filter change: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "d");
+	ESP_LOGV(TAG, "Fan - Time to filter change: ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "d");
 
 	// ===
 	for(i = 0; i < STATUS_V180_x8d_NB_TEMP2; i++)
@@ -1985,20 +1985,20 @@ void czdec::reply_r_status_v180_x8d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "x8d_b ?Temp2 #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "x8d_b ?Temp2 #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp2[i], 2);
 	}
 
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2021,37 +2021,37 @@ void czdec::reply_r_status_v180_runtime_and_energy(comfortzone_heatpump *czhp, K
 	float reg_v_f;
 
 	dump_unknown("RAW R_REPLY_STATUS_V180_STATUS_runtime_and_energy", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	reg_v = get_uint32(q->unknown1);
-	ESP_LOGD(TAG, "unknown1_v180_runtime_and_energy : ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, " ");
+	ESP_LOGV(TAG, "unknown1_v180_runtime_and_energy : ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, " ");
 	dump_unknown("", q->unknown1, 4);
 
 	// ===
 	reg_v = get_uint32(q->total_runtime);
 
-	ESP_LOGD(TAG, "Total runtime: ");
-	ESP_LOGD(TAG, reg_v / 60);
-	ESP_LOGD(TAG, ":");
+	ESP_LOGV(TAG, "Total runtime: ");
+	ESP_LOGV(TAG, reg_v / 60);
+	ESP_LOGV(TAG, ":");
 	reg_v = reg_v % 60;
 	if(reg_v < 10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "");
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "");
 
 	// ===
 	reg_v = get_uint32(q->compressor_runtime);
 
-	ESP_LOGD(TAG, "Compressor runtime: ");
-	ESP_LOGD(TAG, reg_v / 60);
-	ESP_LOGD(TAG, ":");
+	ESP_LOGV(TAG, "Compressor runtime: ");
+	ESP_LOGV(TAG, reg_v / 60);
+	ESP_LOGV(TAG, ":");
 	reg_v = reg_v % 60;
 	if(reg_v < 10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "");
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "");
 
 	// ===
 	reg_v = get_uint32(q->compressor_energy);
@@ -2059,9 +2059,9 @@ void czdec::reply_r_status_v180_runtime_and_energy(comfortzone_heatpump *czhp, K
 	reg_v_f = reg_v;
 	reg_v_f /= 100.0;
 
-	ESP_LOGD(TAG, "Compressor energy: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "kWh");
+	ESP_LOGV(TAG, "Compressor energy: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "kWh");
 
 	// ===
 	reg_v = get_uint32(q->add_energy);
@@ -2069,9 +2069,9 @@ void czdec::reply_r_status_v180_runtime_and_energy(comfortzone_heatpump *czhp, K
 	reg_v_f = reg_v;
 	reg_v_f /= 100.0;
 
-	ESP_LOGD(TAG, "Add energy: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "kWh");
+	ESP_LOGV(TAG, "Add energy: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "kWh");
 
 	// ===
 	reg_v = get_uint32(q->hot_water_energy);
@@ -2079,14 +2079,14 @@ void czdec::reply_r_status_v180_runtime_and_energy(comfortzone_heatpump *czhp, K
 	reg_v_f = reg_v;
 	reg_v_f /= 100.0;
 
-	ESP_LOGD(TAG, "Hot water energy: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "kWh");
+	ESP_LOGV(TAG, "Hot water energy: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "kWh");
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2099,15 +2099,15 @@ void czdec::reply_r_status_v180_xa1(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	//float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_xa1", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_xa1", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2140,49 +2140,49 @@ void czdec::reply_r_status_v180_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *k
 	//float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_02", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_02a", q->heatpump_status, 1);
 
-	ESP_LOGD(TAG, "* Alarm: ");
+	ESP_LOGV(TAG, "* Alarm: ");
 	if(q->heatpump_status[0] & 0x80)
-		ESP_LOGD(TAG, "yes");
+		ESP_LOGV(TAG, "yes");
 	else
-		ESP_LOGD(TAG, "no");
+		ESP_LOGV(TAG, "no");
 
-	ESP_LOGD(TAG, "* Compressor running: ");
+	ESP_LOGV(TAG, "* Compressor running: ");
 	if(q->heatpump_status[0] & 0x01)
-		ESP_LOGD(TAG, "yes");
+		ESP_LOGV(TAG, "yes");
 	else
-		ESP_LOGD(TAG, "no");
+		ESP_LOGV(TAG, "no");
 
-	ESP_LOGD(TAG, "* Additional power: ");
+	ESP_LOGV(TAG, "* Additional power: ");
 	if(q->heatpump_status[0] & 0x10)
-		ESP_LOGD(TAG, "yes");
+		ESP_LOGV(TAG, "yes");
 	else
-		ESP_LOGD(TAG, "no");
+		ESP_LOGV(TAG, "no");
 
-	ESP_LOGD(TAG, "* bit 6-5,3-1 not decoded");
+	ESP_LOGV(TAG, "* bit 6-5,3-1 not decoded");
 
 	dump_unknown("unknown_v180_02b", q->heatpump_status+1, 1);
 
-	ESP_LOGD(TAG, "* LED mode: ");
+	ESP_LOGV(TAG, "* LED mode: ");
 	if(q->heatpump_status[1] & 0x80)
-		ESP_LOGD(TAG, " error (red)");
+		ESP_LOGV(TAG, " error (red)");
 	else
-		ESP_LOGD(TAG, " normal (green)");
+		ESP_LOGV(TAG, " normal (green)");
 
-	ESP_LOGD(TAG, "* Luminosity level: ");
+	ESP_LOGV(TAG, "* Luminosity level: ");
 
 	switch((q->heatpump_status[1] >> 4) & 0x07)
 	{
 		case 0:
-					ESP_LOGD(TAG, "0");
+					ESP_LOGV(TAG, "0");
 					break;
 
 		case 1:
-					ESP_LOGD(TAG, "UNKNOWN: 1");
+					ESP_LOGV(TAG, "UNKNOWN: 1");
 					break;
 
 		case 2:
@@ -2190,21 +2190,21 @@ void czdec::reply_r_status_v180_02(comfortzone_heatpump *czhp, KNOWN_REGISTER *k
 		case 4:
 		case 5:
 		case 6:
-					ESP_LOGD(TAG, (q->heatpump_status[1] >> 4) & 0x07) - 1);
+					ESP_LOGV(TAG, (q->heatpump_status[1] >> 4) & 0x07) - 1);
 					break;
 		case 7:
-					ESP_LOGD(TAG, "UNKNOWN: 7");
+					ESP_LOGV(TAG, "UNKNOWN: 7");
 					break;
 	}
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
-	ESP_LOGD(TAG, "* bit 3-0 not decoded");
-	ESP_LOGD(TAG, "* bit 0 is related to heatpump running, perhaps mode (hot water, room heating...");
+	ESP_LOGV(TAG, "* bit 3-0 not decoded");
+	ESP_LOGV(TAG, "* bit 0 is related to heatpump running, perhaps mode (hot water, room heating...");
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2217,15 +2217,15 @@ void czdec::reply_r_status_v180_xa3(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	//float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_xa3", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	dump_unknown("unknown_v180_xa3", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2250,7 +2250,7 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	// ===
 
 	dump_unknown("RAW unknown_v180_xad", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	reg_v = get_uint16(q->hot_water_calculated_setting);
@@ -2258,9 +2258,9 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Hot water calculated setting: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Hot water calculated setting: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	for(i = 0; i < STATUS_V180_x8a_NB_TEMP1; i++)
@@ -2270,12 +2270,12 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "xad ?Temp1 #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "xad ?Temp1 #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp1[i], 2);
 	}
 
@@ -2291,12 +2291,12 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "xad ?Temp1a #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "xad ?Temp1a #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp1a[i], 2);
 	}
 
@@ -2306,9 +2306,9 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Condensing temperature: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Condensing temperature: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	reg_v = get_uint16(q->condensing_pressure);
@@ -2316,9 +2316,9 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Condensing pressure: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "bar");
+	ESP_LOGV(TAG, "Condensing pressure: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "bar");
 
 	// ===
 	reg_v = get_uint16(q->evaporator_pressure);
@@ -2326,9 +2326,9 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Evaporator pressure: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "bar");
+	ESP_LOGV(TAG, "Evaporator pressure: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "bar");
 
 	// ===
 	reg_v = get_uint16(q->pressure_ratio);
@@ -2336,9 +2336,9 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Pressure ratio: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "Pressure ratio: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "");
 
 	// ===
 	for(i = 0; i < STATUS_V180_x8a_NB_TEMP2; i++)
@@ -2348,12 +2348,12 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "xad ?Temp2 #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "xad ?Temp2 #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp2[i], 2);
 	}
 
@@ -2363,9 +2363,9 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - target compressor frequency: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "Hz");
+	ESP_LOGV(TAG, "Heatpump - target compressor frequency: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "Hz");
 
 	// ===
 	dump_unknown("unknown1_v180_xad", q->unknown1, sizeof(q->unknown1));
@@ -2376,9 +2376,9 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heatpump - current compressor frequency: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "Hz");
+	ESP_LOGV(TAG, "Heatpump - current compressor frequency: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "Hz");
 
 	// ===
 	reg_v = get_uint16(q->heating_compressor_max_frequency);
@@ -2386,9 +2386,9 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Heating compressor max freq.: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "Hz");
+	ESP_LOGV(TAG, "Heating compressor max freq.: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "Hz");
 
 	// ===
 	for(i = 0; i < STATUS_V180_x8a_NB_TEMP3; i++)
@@ -2398,49 +2398,49 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "xad ?Temp3 #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "xad ?Temp3 #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp3[i], 2);
 	}
 
 	// ===
 	reg_v = get_uint16(q->heatpump_current_compressor_power);
 
-	ESP_LOGD(TAG, "Heatpump - current compressor power: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "W");
+	ESP_LOGV(TAG, "Heatpump - current compressor power: ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "W");
 
 	// ===
 	reg_v = get_uint32(q->heatpump_current_add_power);
 
-	ESP_LOGD(TAG, "Heatpump - current add power: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "W");
+	ESP_LOGV(TAG, "Heatpump - current add power: ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "W");
 
 	// ===
 	reg_v = get_uint32(q->heatpump_current_total_power1);
 
-	ESP_LOGD(TAG, "Heatpump - current total power 1: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "W");
+	ESP_LOGV(TAG, "Heatpump - current total power 1: ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "W");
 
 	// ===
 	reg_v = get_uint32(q->heatpump_current_total_power2);
 
-	ESP_LOGD(TAG, "Heatpump - current total power 2: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "W");
+	ESP_LOGV(TAG, "Heatpump - current total power 2: ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "W");
 
 	// ===
 	reg_v = get_uint16(q->heatpump_compressor_input_power);
 
-	ESP_LOGD(TAG, "Heatpump - Compressor input power: ");
-	ESP_LOGD(TAG, reg_v);
-	ESP_LOGD(TAG, "W");
+	ESP_LOGV(TAG, "Heatpump - Compressor input power: ");
+	ESP_LOGV(TAG, reg_v);
+	ESP_LOGV(TAG, "W");
 
 	// ===
 	for(i = 0; i < STATUS_V180_x8a_NB_TEMP4; i++)
@@ -2450,12 +2450,12 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "xad ?Temp4 #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "xad ?Temp4 #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp4[i], 2);
 	}
 
@@ -2467,12 +2467,12 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 		reg_v_f = reg_v;
 		reg_v_f /= 10.0;
 
-		ESP_LOGD(TAG, "xad ?Temp5 #");
-		ESP_LOGD(TAG, i);
-		ESP_LOGD(TAG, ": ");
-		ESP_LOGD(TAG, reg_v_f);
-		ESP_LOGD(TAG, "°C");
-		ESP_LOGD(TAG, " ");
+		ESP_LOGV(TAG, "xad ?Temp5 #");
+		ESP_LOGV(TAG, i);
+		ESP_LOGV(TAG, ": ");
+		ESP_LOGV(TAG, reg_v_f);
+		ESP_LOGV(TAG, "°C");
+		ESP_LOGV(TAG, " ");
 		dump_unknown("", q->temp5[i], 2);
 	}
 
@@ -2480,31 +2480,31 @@ void czdec::reply_r_status_v180_xad(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v = get_uint16(q->expansion_valve_calculated_setting);
 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Expansion valve - Calculated setting: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "K");
+	ESP_LOGV(TAG, "Expansion valve - Calculated setting: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "K");
 
 	// ===
 	reg_v = get_int16(q->vanne_expansion_xxx);
 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Expansion valve - xxx?: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "K");
+	ESP_LOGV(TAG, "Expansion valve - xxx?: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "K");
 
 	// ===
 	reg_v = get_int16(q->expansion_valve_temperature_difference);
 	reg_v_f = reg_v / 10;
 
-	ESP_LOGD(TAG, "Expansion valve - Temperature difference 1: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "K");
+	ESP_LOGV(TAG, "Expansion valve - Temperature difference 1: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "K");
 
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2517,16 +2517,16 @@ void czdec::reply_r_status_v180_xc7(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	//float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_xc7", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_xc7", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2538,16 +2538,16 @@ void czdec::reply_r_status_v180_xc72(comfortzone_heatpump *czhp, KNOWN_REGISTER 
 	//int reg_v;
 	//float reg_v_f;
 	dump_unknown("RAW unknown_v180_xc72", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_xc72", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2563,10 +2563,10 @@ void czdec::reply_r_status_v180_xc5(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	// seems to never change
 	dump_unknown("unknown_v180_xc5", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2580,34 +2580,34 @@ void czdec::reply_r_status_v180_xbf(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	char v[2];
 
 	dump_unknown("RAW unknown_v180_xbf", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_xbf", q->unknown, sizeof(q->unknown));
 
 	// ===
-	ESP_LOGD(TAG, "UI Software version: ");
-	ESP_LOGD(TAG, q->ui_software_major_version);
-	ESP_LOGD(TAG, ".");
-	ESP_LOGD(TAG, q->ui_software_minor_version);
-	ESP_LOGD(TAG, ".");
-	ESP_LOGD(TAG, q->ui_software_patch_version);
+	ESP_LOGV(TAG, "UI Software version: ");
+	ESP_LOGV(TAG, q->ui_software_major_version);
+	ESP_LOGV(TAG, ".");
+	ESP_LOGV(TAG, q->ui_software_minor_version);
+	ESP_LOGV(TAG, ".");
+	ESP_LOGV(TAG, q->ui_software_patch_version);
 
 	v[0] = 'A' + q->ui_hardware_version - 1;
 	v[1] = '\0';
 
-	ESP_LOGD(TAG, "UI Hardware version: ");
-	ESP_LOGD(TAG, v);
+	ESP_LOGV(TAG, "UI Hardware version: ");
+	ESP_LOGV(TAG, v);
 
 	// ===
 
 	dump_unknown("unknown1_v180_xbf", q->unknown, sizeof(q->unknown1));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2620,16 +2620,16 @@ void czdec::reply_r_status_v180_x6d(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	//float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_x6d", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_x6d", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2643,25 +2643,25 @@ void czdec::reply_r_status_v180_x56(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	//float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_x56", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	reg_v = q->bcd_second;
 
-	ESP_LOGD(TAG, "Second (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Second (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	reg_v = q->bcd_minute;
 
-	ESP_LOGD(TAG, "Minute (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Minute (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	reg_v = q->bcd_hour;
 
-	ESP_LOGD(TAG, "Hour (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Hour (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	dump_unknown("unknown_s08_0 (increase by 1 every day but it is not day of week)", &(q->unknown0), sizeof(q->unknown0));
@@ -2669,30 +2669,30 @@ void czdec::reply_r_status_v180_x56(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	// ===
 	reg_v = q->bcd_day;
 
-	ESP_LOGD(TAG, "Day (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Day (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	reg_v = q->bcd_month;
 
-	ESP_LOGD(TAG, "Month (BCD): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Month (BCD): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 	// ===
 	reg_v = q->bcd_year;
 
-	ESP_LOGD(TAG, "Year (BCD)(20xx): ");
-	ESP_LOGD(TAG, reg_v, HEX);
+	ESP_LOGV(TAG, "Year (BCD)(20xx): ");
+	ESP_LOGV(TAG, reg_v, HEX);
 
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_x56", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2705,16 +2705,16 @@ void czdec::reply_r_status_v180_short2(comfortzone_heatpump *czhp, KNOWN_REGISTE
 	//float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_SHORT2", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_SHORT2", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2728,29 +2728,29 @@ void czdec::reply_r_status_v180_ui_versions(comfortzone_heatpump *czhp, KNOWN_RE
 	char v[2];
 
 	dump_unknown("RAW unknown_v180_ui_versions", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
-	ESP_LOGD(TAG, "UI Software version: ");
-	ESP_LOGD(TAG, q->ui_software_major_version);
-	ESP_LOGD(TAG, ".");
-	ESP_LOGD(TAG, q->ui_software_minor_version);
-	ESP_LOGD(TAG, ".");
-	ESP_LOGD(TAG, q->ui_software_patch_version);
+	ESP_LOGV(TAG, "UI Software version: ");
+	ESP_LOGV(TAG, q->ui_software_major_version);
+	ESP_LOGV(TAG, ".");
+	ESP_LOGV(TAG, q->ui_software_minor_version);
+	ESP_LOGV(TAG, ".");
+	ESP_LOGV(TAG, q->ui_software_patch_version);
 
 	v[0] = 'A' + q->ui_hardware_version - 1;
 	v[1] = '\0';
 
-	ESP_LOGD(TAG, "UI Hardware version: ");
-	ESP_LOGD(TAG, v);
+	ESP_LOGV(TAG, "UI Hardware version: ");
+	ESP_LOGV(TAG, v);
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_ui_versions", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2763,16 +2763,16 @@ void czdec::reply_r_status_v180_x2c(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	//float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_x2c", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	// seems to never change
 	dump_unknown("unknown_v180_x2c", q->unknown, sizeof(q->unknown));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2788,7 +2788,7 @@ void czdec::reply_r_status_v180_settings(comfortzone_heatpump *czhp, KNOWN_REGIS
 	float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_settings", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	dump_unknown("unknown_v180_settings", q->unknown, sizeof(q->unknown));
@@ -2799,17 +2799,17 @@ void czdec::reply_r_status_v180_settings(comfortzone_heatpump *czhp, KNOWN_REGIS
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Hot water user setting: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "°C");
+	ESP_LOGV(TAG, "Hot water user setting: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "°C");
 
 	// ===
 	dump_unknown("unknown1_v180_settings", q->unknown1, sizeof(q->unknown1));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 
@@ -2827,7 +2827,7 @@ void czdec::reply_r_status_v180_c8a(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	float reg_v_f;
 
 	dump_unknown("RAW unknown_v180_c8a", (byte *)q, sizeof(*q));
-	ESP_LOGD(TAG, "");
+	ESP_LOGV(TAG, "");
 
 	// ===
 	reg_v = get_uint16(q->fan_speed_duty);
@@ -2835,17 +2835,17 @@ void czdec::reply_r_status_v180_c8a(comfortzone_heatpump *czhp, KNOWN_REGISTER *
 	reg_v_f = reg_v;
 	reg_v_f /= 10.0;
 
-	ESP_LOGD(TAG, "Fan Speed duty: ");
-	ESP_LOGD(TAG, reg_v_f);
-	ESP_LOGD(TAG, "%");
+	ESP_LOGV(TAG, "Fan Speed duty: ");
+	ESP_LOGV(TAG, reg_v_f);
+	ESP_LOGV(TAG, "%");
 
 	// ===
 	dump_unknown("unknown1_v180_c8a", q->unknown1, sizeof(q->unknown1));
 
-	ESP_LOGD(TAG, "crc: ");
+	ESP_LOGV(TAG, "crc: ");
 	if(q->crc < 0x10)
-		ESP_LOGD(TAG, "0");
-	ESP_LOGD(TAG, q->crc, HEX);
+		ESP_LOGV(TAG, "0");
+	ESP_LOGV(TAG, q->crc, HEX);
 #endif
 }
 

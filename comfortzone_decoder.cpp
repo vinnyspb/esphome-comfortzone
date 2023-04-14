@@ -515,28 +515,28 @@ comfortzone_heatpump::PROCESSED_FRAME_TYPE czdec::process_frame(comfortzone_heat
 			switch(czph->cmd)
 			{
 				case 'R':
-							ESP_LOGD(TAG, "%s (get): ====================================================", kr_decoder[i].reg_name);
+							ESP_LOGV(TAG, "%s (get): ====================================================", kr_decoder[i].reg_name);
 
 							kr_decoder[i].cmd_r(cz_class, &kr_decoder[i], (R_CMD*)czph);
 
 							return comfortzone_heatpump::PFT_QUERY;
 
 				case 'W':
-							ESP_LOGD(TAG, "%s (set): ====================================================", kr_decoder[i].reg_name);
+							ESP_LOGV(TAG, "%s (set): ====================================================", kr_decoder[i].reg_name);
 
 							kr_decoder[i].cmd_w(cz_class, &kr_decoder[i], (W_CMD*)czph);
 
 							return comfortzone_heatpump::PFT_QUERY;
 												
 				case 'r':
-							ESP_LOGD(TAG, "%s (reply get): ====================================================", kr_decoder[i].reg_name);
+							ESP_LOGV(TAG, "%s (reply get): ====================================================", kr_decoder[i].reg_name);
 
 							kr_decoder[i].reply_r(cz_class, &kr_decoder[i], (R_REPLY*)czph);
 
 							return comfortzone_heatpump::PFT_REPLY;
 
 				case 'w':
-							ESP_LOGD(TAG, "%s (reply set): ====================================================", kr_decoder[i].reg_name);
+							ESP_LOGV(TAG, "%s (reply set): ====================================================", kr_decoder[i].reg_name);
 
 							kr_decoder[i].reply_w(cz_class, &kr_decoder[i], (W_REPLY*)czph);
 
@@ -547,14 +547,14 @@ comfortzone_heatpump::PROCESSED_FRAME_TYPE czdec::process_frame(comfortzone_heat
 		i++;
 	}
 
-	ESP_LOGD(TAG, "unknown register");
+	ESP_LOGV(TAG, "unknown register");
 	dump_frame(cz_class, "UNK:");
 	return comfortzone_heatpump::PFT_UNKNOWN;
 }
 
 void czdec::dump_frame(comfortzone_heatpump *cz_class, const char *prefix)
 {
-	ESP_LOGD(TAG, "==============================%s", prefix);
+	ESP_LOGV(TAG, "==============================%s", prefix);
 	ESP_LOG_BUFFER_HEXDUMP(TAG, cz_class->cz_buf, cz_class->cz_size, ESP_LOG_DEBUG);
 }
 

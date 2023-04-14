@@ -154,7 +154,7 @@ time:
 
 # Enable logging
 logger:
-  level: INFO
+  level: DEBUG
   # hardware_uart: USB_CDC
 
 # Enable Home Assistant API
