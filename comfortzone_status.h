@@ -88,6 +88,9 @@ typedef struct
 	// current heatpump calculated setting
 	sensor::Sensor* fan_speed_duty = new sensor::Sensor();					// %, * 10 (proto: 1.60, 1.80)
 	sensor::Sensor* hot_water_calculated_setting = new sensor::Sensor();	// °C, * 10 (heatpump selected). can be hot_water_setting (no extra hot water) or a different value (proto: 1.60, 1.80)
+
+	text_sensor::TextSensor* unknown_s02_3 = new text_sensor::TextSensor();
+	text_sensor::TextSensor* unknown_general_status = new text_sensor::TextSensor();
 } COMFORTZONE_STATUS;
 
 }

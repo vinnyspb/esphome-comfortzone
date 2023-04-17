@@ -21,9 +21,6 @@ esp32:
   board: lolin_s2_mini
   framework:
     type: esp-idf
-    sdkconfig_options:
-      # CONFIG_ESP_CONSOLE_USB_CDC: y
-      CONFIG_SPIRAM_USE: SPIRAM_USE_MALLOC
 
 uart:
   id: uart_bus
@@ -34,17 +31,7 @@ uart:
   parity: NONE
   stop_bits: 1
 
-# debug:
-#   update_interval: 5s
-
 sensor:
-# - platform: debug
-#   free:
-#     name: "Heap Free"
-#   block:
-#     name: "Heap Max Block"
-#   loop_time:
-#     name: "Loop Time"
 - platform: custom
   lambda: |-
     auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
@@ -132,11 +119,6 @@ binary_sensor:
       - name: "Extra hot water setting"
 
 text_sensor:
-  # - platform: debug
-  #   device:
-  #     name: "Device Info"
-  #   reset_reason:
-  #     name: "Reset Reason"
   - platform: custom
     lambda: |-
       auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
@@ -147,15 +129,15 @@ text_sensor:
       - name: "Mode"
       - name: "Fan speed"
       - name: "Hot water priority setting"
+      - name: "unknown_s02_3"
+      - name: "unknown_general_status"
 
 time:
   - platform: sntp
     id: sntp_time
 
-# Enable logging
 logger:
-  level: DEBUG
-  # hardware_uart: USB_CDC
+  level: INFO
 
 # Enable Home Assistant API
 api:
@@ -166,10 +148,4 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-
-  manual_ip:
-    static_ip: 192.168.1.10
-    gateway: 192.168.1.1
-    subnet: 255.255.255.0
-
   power_save_mode: none

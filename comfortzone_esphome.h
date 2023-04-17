@@ -84,7 +84,9 @@ class ComfortzoneComponent : public Component, public UARTDevice {
       status.compressor_activity,
       status.mode,
       status.fan_speed,
-      status.hot_water_priority_setting
+      status.hot_water_priority_setting,
+      status.unknown_s02_3,
+      status.unknown_general_status
     };
   }
 
