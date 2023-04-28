@@ -1,21 +1,13 @@
 esphome:
   name: comfortzone
+  platformio_options:
+    build_flags: -D HP_PROTOCOL=180
   libraries:
     - https://github.com/vinnyspb/FastCRC.git
+    - https://github.com/vinnyspb/comfortzone_heatpump.git#feature/adding_new_protocol_version
   includes:
+    - esphome_rs485.h
     - comfortzone_esphome.h
-    - comfortzone_heatpump.h
-    - comfortzone_config.h
-    - comfortzone_status.h
-    - comfortzone_frame.h
-    - comfortzone_decoder.h
-    - comfortzone_crafting.h
-    - comfortzone_tools.h
-    - comfortzone_heatpump.cpp
-    - comfortzone_decoder.cpp
-    - comfortzone_decoder_basic.cpp
-    - comfortzone_decoder_status.cpp
-    - comfortzone_crafting.cpp
 
 esp32:
   board: lolin_s2_mini
@@ -78,6 +70,12 @@ sensor:
     - name: "Current compressor input power"
       id: current_compressor_input_power
       unit_of_measurement: W
+    - name: "Current compressor heating input power"
+      id: current_compressor_heating_input_power
+      unit_of_measurement: W
+    - name: "Current compressor water input power"
+      id: current_compressor_water_input_power
+      unit_of_measurement: W
     - name: "Compressor energy"
       unit_of_measurement: kWh
     - name: "Additional energy"
@@ -94,15 +92,26 @@ sensor:
     - name: "Hot water setting"
       unit_of_measurement: °C
       accuracy_decimals: 1
-    - name: "LED luminosity setting"
     - name: "Fan speed duty"
       unit_of_measurement: "%"
     - name: "Hot water calculated setting"
       unit_of_measurement: °C
       accuracy_decimals: 1
+    - name: "Heating CoP"
+      state_class: measurement
+      accuracy_decimals: 2
+    - name: "Hot Water CoP"
+      state_class: measurement
+      accuracy_decimals: 2
 - platform: total_daily_energy
   name: "Total Daily Input Energy"
   power_id: current_compressor_input_power
+- platform: total_daily_energy
+  name: "Total Daily Heating Input Energy"
+  power_id: current_compressor_heating_input_power
+- platform: total_daily_energy
+  name: "Total Daily Water Input Energy"
+  power_id: current_compressor_water_input_power
 
 binary_sensor:
   - platform: custom
@@ -129,8 +138,15 @@ text_sensor:
       - name: "Mode"
       - name: "Fan speed"
       - name: "Hot water priority setting"
-      - name: "unknown_s02_3"
-      - name: "unknown_general_status"
+
+climate:
+  - platform: custom
+    lambda: |-
+      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+      return {cz};
+
+    climates:
+      - name: "ComfortZone EX50"
 
 time:
   - platform: sntp
