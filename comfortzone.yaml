@@ -143,10 +143,11 @@ climate:
   - platform: custom
     lambda: |-
       auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
-      return {cz};
+      return cz->get_climate_entities();
 
     climates:
-      - name: "ComfortZone EX50"
+      - name: "ComfortZone EX50 heating"
+      - name: "ComfortZone EX50 hot water"
 
 time:
   - platform: sntp

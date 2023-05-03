@@ -127,7 +127,77 @@ namespace esphome::comfortzone
     }
   }
 
-  class ComfortzoneComponent : public Component, public UARTDevice, public Climate
+  class ComfortzoneHeatpumpClimate : public Climate
+  {
+  public:
+    void control(const ClimateCall &call) override
+    {
+      // if (call.get_mode().has_value())
+      // {
+      //   // User requested mode change
+      //   ClimateMode mode = *call.get_mode();
+      //   // Send mode to hardware
+      //   // ...
+
+      //   // Publish updated state
+      //   this->mode = mode;
+      //   this->publish_state();
+      // }
+      // if (call.get_target_temperature().has_value())
+      // {
+      //   // User requested target temperature change
+      //   float temp = *call.get_target_temperature();
+      //   // Send target temp to climate
+      //   // ...
+      // }
+    }
+
+    ClimateTraits traits() override
+    {
+      // The capabilities of the climate device
+      auto traits = climate::ClimateTraits();
+      traits.set_supports_current_temperature(true);
+      traits.set_supported_modes({climate::CLIMATE_MODE_HEAT, climate::CLIMATE_MODE_OFF});
+      return traits;
+    }
+  };
+
+  class ComfortzoneWaterHeaterClimate : public Climate
+  {
+  public:
+    void control(const ClimateCall &call) override
+    {
+      // if (call.get_mode().has_value())
+      // {
+      //   // User requested mode change
+      //   ClimateMode mode = *call.get_mode();
+      //   // Send mode to hardware
+      //   // ...
+
+      //   // Publish updated state
+      //   this->mode = mode;
+      //   this->publish_state();
+      // }
+      // if (call.get_target_temperature().has_value())
+      // {
+      //   // User requested target temperature change
+      //   float temp = *call.get_target_temperature();
+      //   // Send target temp to climate
+      //   // ...
+      // }
+    }
+
+    ClimateTraits traits() override
+    {
+      // The capabilities of the climate device
+      auto traits = climate::ClimateTraits();
+      traits.set_supports_current_temperature(true);
+      traits.set_supported_modes({climate::CLIMATE_MODE_HEAT, climate::CLIMATE_MODE_OFF});
+      return traits;
+    }
+  };
+
+  class ComfortzoneComponent : public Component, public UARTDevice
   {
   public:
     int de_pin;
@@ -186,6 +256,9 @@ namespace esphome::comfortzone
 
     Sensor *heating_cop = new Sensor();
     Sensor *water_cop = new Sensor();
+
+    ComfortzoneHeatpumpClimate *heatpump_climate = new ComfortzoneHeatpumpClimate();
+    ComfortzoneWaterHeaterClimate *water_heater_climate = new ComfortzoneWaterHeaterClimate();
 
     static ComfortzoneComponent *get_singleton(UARTComponent *parent)
     {
@@ -259,6 +332,32 @@ namespace esphome::comfortzone
       heatpump_current_add_power->add_on_state_callback(on_power_changed);
       heatpump_current_total_power->add_on_state_callback(on_power_changed);
       heatpump_current_compressor_input_power->add_on_state_callback(on_power_changed);
+
+      sensors_te3_indoor_temp->add_on_state_callback([this](float t) {
+        heatpump_climate->current_temperature = t;
+        heatpump_climate->publish_state();
+      });
+      room_heating_setting->add_on_state_callback([this](float t) {
+        heatpump_climate->target_temperature = t;
+        heatpump_climate->publish_state();
+      });
+      room_heating_in_progress->add_on_state_callback([this](bool in_progress) {
+        heatpump_climate->mode = in_progress ? climate::CLIMATE_MODE_HEAT : climate::CLIMATE_MODE_OFF;
+        heatpump_climate->publish_state();
+      });
+
+      sensors_te24_hot_water_temp->add_on_state_callback([this](float t) {
+        water_heater_climate->current_temperature = t;
+        water_heater_climate->publish_state();
+      });
+      hot_water_setting->add_on_state_callback([this](float t) {
+        water_heater_climate->target_temperature = t;
+        water_heater_climate->publish_state();
+      });
+      hot_water_production->add_on_state_callback([this](bool in_progress) {
+        water_heater_climate->mode = in_progress ? climate::CLIMATE_MODE_HEAT : climate::CLIMATE_MODE_OFF;
+        water_heater_climate->publish_state();
+      });
 
       heatpump->begin();
     }
@@ -351,40 +450,16 @@ namespace esphome::comfortzone
           hot_water_priority_setting};
     }
 
+    std::vector<Climate *> get_climate_entities()
+    {
+      return {
+          heatpump_climate,
+          water_heater_climate};
+    }
+
     void dump_config() override
     {
       ESP_LOGCONFIG(TAG, "Comfortzone initialized");
-    }
-
-    void control(const ClimateCall &call) override
-    {
-      // if (call.get_mode().has_value())
-      // {
-      //   // User requested mode change
-      //   ClimateMode mode = *call.get_mode();
-      //   // Send mode to hardware
-      //   // ...
-
-      //   // Publish updated state
-      //   this->mode = mode;
-      //   this->publish_state();
-      // }
-      // if (call.get_target_temperature().has_value())
-      // {
-      //   // User requested target temperature change
-      //   float temp = *call.get_target_temperature();
-      //   // Send target temp to climate
-      //   // ...
-      // }
-    }
-
-    ClimateTraits traits() override
-    {
-      // The capabilities of the climate device
-      auto traits = climate::ClimateTraits();
-      traits.set_supports_current_temperature(true);
-      traits.set_supported_modes({climate::CLIMATE_MODE_HEAT});
-      return traits;
     }
 
   private:
@@ -395,5 +470,4 @@ namespace esphome::comfortzone
   };
 
   ComfortzoneComponent *ComfortzoneComponent::singleton = nullptr;
-
 }
