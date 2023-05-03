@@ -158,6 +158,16 @@ logger:
 
 # Enable Home Assistant API
 api:
+  services:
+    - service: debug_reroute
+      variables:
+        ip: string
+        port: int
+        timeout: int
+      then:
+        - lambda: |-
+            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+            cz->debug_reroute(ip, port, timeout);
 
 ota:
   password: !secret ota_password

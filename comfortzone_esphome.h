@@ -1,6 +1,7 @@
 #include "esphome.h"
 #include <cmath>
 #include <vector>
+#include <chrono>
 #include "comfortzone_heatpump.h"
 #include "esphome_rs485.h"
 
@@ -260,6 +261,14 @@ namespace esphome::comfortzone
     ComfortzoneHeatpumpClimate *heatpump_climate = new ComfortzoneHeatpumpClimate();
     ComfortzoneWaterHeaterClimate *water_heater_climate = new ComfortzoneWaterHeaterClimate();
 
+    // for debugging purposes
+    uint8_t *grab_buffer = new uint8_t[256];
+    uint16_t grab_frame_size = 0;
+    std::chrono::steady_clock::time_point debug_until = {};
+    struct sockaddr_in src_addr;
+    struct sockaddr_in dest_addr;
+    std::unique_ptr<socket::Socket> sock = nullptr;
+
     static ComfortzoneComponent *get_singleton(UARTComponent *parent)
     {
       if (singleton == nullptr)
@@ -333,31 +342,31 @@ namespace esphome::comfortzone
       heatpump_current_total_power->add_on_state_callback(on_power_changed);
       heatpump_current_compressor_input_power->add_on_state_callback(on_power_changed);
 
-      sensors_te3_indoor_temp->add_on_state_callback([this](float t) {
+      sensors_te3_indoor_temp->add_on_state_callback([this](float t)
+                                                     {
         heatpump_climate->current_temperature = t;
-        heatpump_climate->publish_state();
-      });
-      room_heating_setting->add_on_state_callback([this](float t) {
+        heatpump_climate->publish_state(); });
+      room_heating_setting->add_on_state_callback([this](float t)
+                                                  {
         heatpump_climate->target_temperature = t;
-        heatpump_climate->publish_state();
-      });
-      room_heating_in_progress->add_on_state_callback([this](bool in_progress) {
+        heatpump_climate->publish_state(); });
+      room_heating_in_progress->add_on_state_callback([this](bool in_progress)
+                                                      {
         heatpump_climate->mode = in_progress ? climate::CLIMATE_MODE_HEAT : climate::CLIMATE_MODE_OFF;
-        heatpump_climate->publish_state();
-      });
+        heatpump_climate->publish_state(); });
 
-      sensors_te24_hot_water_temp->add_on_state_callback([this](float t) {
+      sensors_te24_hot_water_temp->add_on_state_callback([this](float t)
+                                                         {
         water_heater_climate->current_temperature = t;
-        water_heater_climate->publish_state();
-      });
-      hot_water_setting->add_on_state_callback([this](float t) {
+        water_heater_climate->publish_state(); });
+      hot_water_setting->add_on_state_callback([this](float t)
+                                               {
         water_heater_climate->target_temperature = t;
-        water_heater_climate->publish_state();
-      });
-      hot_water_production->add_on_state_callback([this](bool in_progress) {
+        water_heater_climate->publish_state(); });
+      hot_water_production->add_on_state_callback([this](bool in_progress)
+                                                  {
         water_heater_climate->mode = in_progress ? climate::CLIMATE_MODE_HEAT : climate::CLIMATE_MODE_OFF;
-        water_heater_climate->publish_state();
-      });
+        water_heater_climate->publish_state(); });
 
       heatpump->begin();
     }
@@ -394,6 +403,44 @@ namespace esphome::comfortzone
           heatpump_current_compressor_heating_input_power->publish_state(0);
         }
         power_changed = false;
+      }
+
+      if (debug_until > std::chrono::steady_clock::time_point{})
+      {
+        if (std::chrono::steady_clock::now() > debug_until)
+        {
+          disable_debugging();
+        }
+        else
+        {
+          forward_to_udp();
+        }
+      }
+    }
+
+    void disable_debugging()
+    {
+      debug_until = std::chrono::steady_clock::time_point{};
+
+      if (sock)
+      {
+        ESP_LOGE(TAG, "Shutting down debug socket");
+        sock->shutdown(0);
+        sock->close();
+        sock = nullptr;
+        heatpump->set_grab_buffer(nullptr, 0, nullptr);
+      }
+      ESP_LOGE(TAG, "Debugging disabled");
+    }
+
+    void forward_to_udp()
+    {
+      int err = sock->sendto(grab_buffer, grab_frame_size, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+      if (err < 0)
+      {
+        ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
+        disable_debugging();
+        return;
       }
     }
 
@@ -460,6 +507,37 @@ namespace esphome::comfortzone
     void dump_config() override
     {
       ESP_LOGCONFIG(TAG, "Comfortzone initialized");
+    }
+
+    void debug_reroute(const std::string &ip, int port, int timeout)
+    {
+      debug_until = std::chrono::steady_clock::now() + std::chrono::seconds(timeout);
+      heatpump->set_grab_buffer(grab_buffer, 256, &grab_frame_size);
+
+      memset(&src_addr, 0, sizeof(src_addr));
+      src_addr.sin_family = AF_INET;
+      src_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+      src_addr.sin_port = htons(502);
+
+      dest_addr.sin_addr.s_addr = inet_addr(ip.c_str());
+      dest_addr.sin_family = AF_INET;
+      dest_addr.sin_port = htons(port);
+
+      sock = socket::socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
+      if (!sock)
+      {
+        ESP_LOGE(TAG, "Unable to create socket: errno %d", errno);
+        disable_debugging();
+        return;
+      }
+
+      if(sock->bind((struct sockaddr *)&src_addr, sizeof(src_addr)) < 0) {
+        ESP_LOGE(TAG, "Unable to bind socket: errno %d", errno);
+        disable_debugging();
+        return;
+      }
+
+      ESP_LOGE(TAG, "Debugging enabled, forwarding to %s:%d for %d seconds", ip.c_str(), port, timeout);
     }
 
   private:
