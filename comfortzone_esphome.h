@@ -258,6 +258,8 @@ namespace esphome::comfortzone
     Sensor *heating_cop = new Sensor();
     Sensor *water_cop = new Sensor();
 
+    Sensor *sensors_te3_indoor_temp_offset = new Sensor();
+
     ComfortzoneHeatpumpClimate *heatpump_climate = new ComfortzoneHeatpumpClimate();
     ComfortzoneWaterHeaterClimate *water_heater_climate = new ComfortzoneWaterHeaterClimate();
 
@@ -368,15 +370,14 @@ namespace esphome::comfortzone
         water_heater_climate->mode = in_progress ? climate::CLIMATE_MODE_HEAT : climate::CLIMATE_MODE_OFF;
         water_heater_climate->publish_state(); });
 
+      sensors_te3_indoor_temp_offset->publish_state(id(te3_offset));
+
       heatpump->begin();
     }
 
     void loop() override
     {
-      if (comfortzone_heatpump::PFT_NONE == heatpump->process())
-      {
-        return;
-      }
+      heatpump->process();
 
       if (power_changed)
       {
@@ -474,7 +475,8 @@ namespace esphome::comfortzone
           fan_speed_duty,
           hot_water_calculated_setting,
           heating_cop,
-          water_cop};
+          water_cop,
+          sensors_te3_indoor_temp_offset};
     }
 
     std::vector<BinarySensor *> get_binary_sensors()
@@ -594,6 +596,7 @@ namespace esphome::comfortzone
 
       last_indoor_temperature_override = std::chrono::system_clock::now();
       id(te3_offset) = offset;
+      sensors_te3_indoor_temp_offset->publish_state(offset);
     }
 
   private:
