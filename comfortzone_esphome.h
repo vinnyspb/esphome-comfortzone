@@ -264,7 +264,7 @@ namespace esphome::comfortzone
     // for debugging purposes
     uint8_t *grab_buffer = new uint8_t[256];
     uint16_t grab_frame_size = 0;
-    std::chrono::steady_clock::time_point debug_until = {};
+    std::chrono::system_clock::time_point debug_until = {};
     struct sockaddr_in src_addr;
     struct sockaddr_in dest_addr;
     std::unique_ptr<socket::Socket> sock = nullptr;
@@ -405,9 +405,9 @@ namespace esphome::comfortzone
         power_changed = false;
       }
 
-      if (debug_until > std::chrono::steady_clock::time_point{})
+      if (debug_until > std::chrono::system_clock::time_point{})
       {
-        if (std::chrono::steady_clock::now() > debug_until)
+        if (std::chrono::system_clock::now() > debug_until)
         {
           disable_debugging();
         }
@@ -420,7 +420,7 @@ namespace esphome::comfortzone
 
     void disable_debugging()
     {
-      debug_until = std::chrono::steady_clock::time_point{};
+      debug_until = std::chrono::system_clock::time_point{};
 
       if (sock)
       {
@@ -511,7 +511,7 @@ namespace esphome::comfortzone
 
     void debug_reroute(const std::string &ip, int port, int timeout)
     {
-      debug_until = std::chrono::steady_clock::now() + std::chrono::seconds(timeout);
+      debug_until = std::chrono::system_clock::now() + std::chrono::seconds(timeout);
       heatpump->set_grab_buffer(grab_buffer, 256, &grab_frame_size);
 
       memset(&src_addr, 0, sizeof(src_addr));
@@ -531,7 +531,8 @@ namespace esphome::comfortzone
         return;
       }
 
-      if(sock->bind((struct sockaddr *)&src_addr, sizeof(src_addr)) < 0) {
+      if (sock->bind((struct sockaddr *)&src_addr, sizeof(src_addr)) < 0)
+      {
         ESP_LOGE(TAG, "Unable to bind socket: errno %d", errno);
         disable_debugging();
         return;
@@ -540,11 +541,68 @@ namespace esphome::comfortzone
       ESP_LOGE(TAG, "Debugging enabled, forwarding to %s:%d for %d seconds", ip.c_str(), port, timeout);
     }
 
+    bool set_sensor_offset(int sensor_num, float temp_offset) // sensor: [0:7], offset in °C (-10.0° -> 10.0°)
+    {
+      if (sensor_num < 0 || sensor_num > 7)
+      {
+        ESP_LOGE(TAG, "Invalid sensor number %d", sensor_num);
+        return false;
+      }
+
+      if (temp_offset < -10.0 || temp_offset > 10.0)
+      {
+        ESP_LOGE(TAG, "Invalid temperature offset %f", temp_offset);
+        return false;
+      }
+
+      if (heatpump->set_sensor_offset(sensor_num, temp_offset))
+      {
+        ESP_LOGE(TAG, "Set sensor %d offset to %f", sensor_num, temp_offset);
+        return true;
+      }
+      else
+      {
+        ESP_LOGE(TAG, "Failed to set sensor %d offset to %f", sensor_num, temp_offset);
+        return false;
+      }
+    }
+
+    void override_indoor_temperature(float temp)
+    {
+      if (!sensors_te3_indoor_temp->has_state() || (std::chrono::system_clock::now() - last_indoor_temperature_override) < std::chrono::minutes(5))
+      {
+        return;
+      }
+
+      const float offset = id(te3_offset) + temp - sensors_te3_indoor_temp->state;
+
+      if(std::abs(offset - id(te3_offset)) < 0.1)
+      {
+        return;
+      }
+
+      ESP_LOGE(TAG, "Calculated indoor temperature offset %.1f (heatpump reported %.1f, overriding with %.1f)", offset, sensors_te3_indoor_temp->state, temp);
+
+      if (heatpump->set_sensor_offset(3, offset))
+      {
+        ESP_LOGE(TAG, "Set successful");
+      }
+      else
+      {
+        ESP_LOGE(TAG, "Failed");
+      }
+
+      last_indoor_temperature_override = std::chrono::system_clock::now();
+      id(te3_offset) = offset;
+    }
+
   private:
     static ComfortzoneComponent *singleton;
 
     comfortzone_heatpump *heatpump;
     bool power_changed = false;
+
+    std::chrono::system_clock::time_point last_indoor_temperature_override = {};
   };
 
   ComfortzoneComponent *ComfortzoneComponent::singleton = nullptr;

@@ -24,6 +24,12 @@ uart:
   parity: NONE
   stop_bits: 1
 
+globals:
+  - id: te3_offset
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
 sensor:
 - platform: custom
   lambda: |-
@@ -160,6 +166,21 @@ logger:
 # Enable Home Assistant API
 api:
   services:
+    - service: set_sensor_offset
+      variables:
+        sensor_num: int
+        offset: float
+      then:
+        - lambda: |-
+            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+            cz->set_sensor_offset(sensor_num, offset);
+    - service: override_indoor_temperature
+      variables:
+        current_temperature: float
+      then:
+        - lambda: |-
+            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+            cz->override_indoor_temperature(current_temperature);
     - service: debug_reroute
       variables:
         ip: string
