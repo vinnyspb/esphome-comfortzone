@@ -194,17 +194,17 @@ namespace esphome::comfortzone
     return traits;
   }
 
-  ComfortzoneComponent *ComfortzoneComponent::get_singleton(UARTComponent *parent)
+  ComfortzoneComponent *ComfortzoneComponent::get_singleton(UARTComponent *parent, int de_pin)
   {
     if (singleton == nullptr)
     {
-      singleton = new ComfortzoneComponent(parent, 37);
+      singleton = new ComfortzoneComponent(parent, de_pin);
       App.register_component(singleton);
     }
     return singleton;
   }
 
-  ComfortzoneComponent::ComfortzoneComponent(UARTComponent *parent, int de_pin) : UARTDevice(parent), de_pin(de_pin)
+  ComfortzoneComponent::ComfortzoneComponent(UARTComponent *parent, int de_pin) : UARTDevice(parent)
   {
     heatpump = new comfortzone_heatpump(new EspHomeRS485Interface(this, de_pin));
   }

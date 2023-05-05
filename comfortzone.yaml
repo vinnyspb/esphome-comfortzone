@@ -1,3 +1,6 @@
+substitutions:
+  de_pin: "37"
+
 esphome:
   name: comfortzone
   platformio_options:
@@ -35,7 +38,7 @@ globals:
 sensor:
 - platform: custom
   lambda: |-
-    auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+    auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
     return cz->get_sensors();
 
   sensors:
@@ -128,7 +131,7 @@ sensor:
 binary_sensor:
   - platform: custom
     lambda: |-
-      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
       return cz->get_binary_sensors();
   
     binary_sensors:
@@ -142,7 +145,7 @@ binary_sensor:
 text_sensor:
   - platform: custom
     lambda: |-
-      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
       return cz->get_text_sensors();
   
     text_sensors:
@@ -154,7 +157,7 @@ text_sensor:
 climate:
   - platform: custom
     lambda: |-
-      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+      auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
       return cz->get_climate_entities();
 
     climates:
@@ -177,14 +180,14 @@ api:
         offset: float
       then:
         - lambda: |-
-            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
             cz->set_sensor_offset(sensor_num, offset);
     - service: override_indoor_temperature
       variables:
         current_temperature: float
       then:
         - lambda: |-
-            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
             cz->override_indoor_temperature(current_temperature);
     - service: debug_reroute
       variables:
@@ -193,7 +196,7 @@ api:
         timeout: int
       then:
         - lambda: |-
-            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus));
+            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
             cz->debug_reroute(ip, port, timeout);
 
 ota:

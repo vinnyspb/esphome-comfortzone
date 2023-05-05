@@ -2,7 +2,8 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
-#include "comfortzone_heatpump.h"
+
+class comfortzone_heatpump;
 
 namespace esphome::comfortzone
 {
@@ -32,7 +33,36 @@ namespace esphome::comfortzone
   class ComfortzoneComponent : public Component, public UARTDevice
   {
   public:
-    int de_pin;
+    static ComfortzoneComponent *get_singleton(UARTComponent *parent, int de_pin);
+
+    float get_setup_priority() const override;
+
+    std::vector<Sensor *> get_sensors();
+
+    std::vector<BinarySensor *> get_binary_sensors();
+
+    std::vector<TextSensor *> get_text_sensors();
+
+    std::vector<Climate *> get_climate_entities();
+
+    void dump_config() override;
+
+    void debug_reroute(const std::string &ip, int port, int timeout);
+
+    bool set_sensor_offset(int sensor_num, float temp_offset); // sensor: [0:7], offset in °C (-10.0° -> 10.0°)
+
+    void override_indoor_temperature(float temp);
+
+    void setup() override;
+    void loop() override;
+
+  private:
+    ComfortzoneComponent(UARTComponent *parent, int de_pin);
+
+    void disable_debugging();
+    void forward_to_udp();
+
+    static ComfortzoneComponent *singleton;
 
     Sensor *fan_time_to_filter_change = new Sensor(); // days (proto: 1.60, 1.80)
 
@@ -101,38 +131,6 @@ namespace esphome::comfortzone
     struct sockaddr_in src_addr;
     struct sockaddr_in dest_addr;
     std::unique_ptr<socket::Socket> sock = nullptr;
-
-    static ComfortzoneComponent *get_singleton(UARTComponent *parent);
-
-    ComfortzoneComponent(UARTComponent *parent, int de_pin);
-
-    float get_setup_priority() const override;
-
-    void setup() override;
-    void loop() override;
-
-    void disable_debugging();
-
-    void forward_to_udp();
-
-    std::vector<Sensor *> get_sensors();
-
-    std::vector<BinarySensor *> get_binary_sensors();
-
-    std::vector<TextSensor *> get_text_sensors();
-
-    std::vector<Climate *> get_climate_entities();
-
-    void dump_config() override;
-
-    void debug_reroute(const std::string &ip, int port, int timeout);
-
-    bool set_sensor_offset(int sensor_num, float temp_offset); // sensor: [0:7], offset in °C (-10.0° -> 10.0°)
-
-    void override_indoor_temperature(float temp);
-
-  private:
-    static ComfortzoneComponent *singleton;
 
     comfortzone_heatpump *heatpump;
     bool power_changed = false;
