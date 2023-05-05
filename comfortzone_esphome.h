@@ -517,7 +517,7 @@ namespace esphome::comfortzone
       memset(&src_addr, 0, sizeof(src_addr));
       src_addr.sin_family = AF_INET;
       src_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-      src_addr.sin_port = htons(502);
+      src_addr.sin_port = htons(9502);
 
       dest_addr.sin_addr.s_addr = inet_addr(ip.c_str());
       dest_addr.sin_family = AF_INET;

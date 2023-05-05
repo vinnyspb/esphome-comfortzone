@@ -1,10 +1,11 @@
 esphome:
   name: comfortzone
   platformio_options:
-    build_flags: -D HP_PROTOCOL=180
+    build_flags:
+      - "-DHP_PROTOCOL=180"
   libraries:
     - https://github.com/vinnyspb/FastCRC.git
-    - https://github.com/vinnyspb/comfortzone_heatpump.git#feature/adding_new_protocol_version
+    - https://github.com/qix67/comfortzone_heatpump.git
   includes:
     - esphome_rs485.h
     - comfortzone_esphome.h
