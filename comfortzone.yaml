@@ -2,6 +2,7 @@ esphome:
   name: comfortzone
   platformio_options:
     build_flags:
+      - "-O3"
       - "-DHP_PROTOCOL=180"
   libraries:
     - https://github.com/vinnyspb/FastCRC.git
@@ -9,6 +10,7 @@ esphome:
   includes:
     - esphome_rs485.h
     - comfortzone_esphome.h
+    - comfortzone_esphome.cpp
 
 esp32:
   board: lolin_s2_mini
