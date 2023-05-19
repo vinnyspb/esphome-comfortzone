@@ -118,6 +118,9 @@ sensor:
     - name: "Indoor temperature sensor offset"
       unit_of_measurement: °C
       accuracy_decimals: 1
+    - name: "Target flow water temperature"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
 - platform: total_daily_energy
   name: "Total Daily Input Energy"
   power_id: current_compressor_input_power

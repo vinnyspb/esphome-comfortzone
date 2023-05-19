@@ -257,6 +257,8 @@ namespace esphome::comfortzone
     status.hot_water_priority_setting.subscribe(on_speed_sensor_update, hot_water_priority_setting);
 
     status.fan_time_to_filter_change.subscribe(on_days_sensor_update, fan_time_to_filter_change);
+    
+    status.calculated_flow_set.subscribe(on_temperature_sensor_update, target_flow_water_temperature);
 
     auto on_power_changed = [this](float)
     {
@@ -399,7 +401,8 @@ namespace esphome::comfortzone
         hot_water_calculated_setting,
         heating_cop,
         water_cop,
-        sensors_te3_indoor_temp_offset};
+        sensors_te3_indoor_temp_offset,
+        target_flow_water_temperature};
   }
 
   std::vector<BinarySensor *> ComfortzoneComponent::get_binary_sensors()

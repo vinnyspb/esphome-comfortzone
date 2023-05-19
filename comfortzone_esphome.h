@@ -121,6 +121,8 @@ namespace esphome::comfortzone
 
     Sensor *sensors_te3_indoor_temp_offset = new Sensor();
 
+    Sensor *target_flow_water_temperature = new Sensor();
+
     ComfortzoneHeatpumpClimate *heatpump_climate = new ComfortzoneHeatpumpClimate();
     ComfortzoneWaterHeaterClimate *water_heater_climate = new ComfortzoneWaterHeaterClimate();
 
