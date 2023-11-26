@@ -201,6 +201,16 @@ api:
         - lambda: |-
             auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
             cz->debug_reroute(ip, port, timeout);
+    - service: enable_fireplace_mode
+      then:
+        - lambda: |-
+            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
+            cz->set_fireplace_mode(true);
+    - service: disable_fireplace_mode
+      then:
+        - lambda: |-
+            auto cz = esphome::comfortzone::ComfortzoneComponent::get_singleton(id(uart_bus), $de_pin);
+            cz->set_fireplace_mode(false);
 
 ota:
   password: !secret ota_password
