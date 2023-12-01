@@ -524,4 +524,15 @@ namespace esphome::comfortzone
     id(te3_offset) = offset;
     sensors_te3_indoor_temp_offset->publish_state(offset);
   }
+
+  bool ComfortzoneComponent::set_fireplace_mode(bool enable)
+  {
+    if(heatpump->set_fireplace_mode(enable)) {
+      ESP_LOGE(TAG, "Fireplace mode: %d SUCCESS", static_cast<int>(enable));
+      return true;
+    } else {
+      ESP_LOGE(TAG, "Fireplace mode: %d FAILED", static_cast<int>(enable));
+      return false;
+    }
+  }
 }

@@ -53,6 +53,8 @@ namespace esphome::comfortzone
 
     void override_indoor_temperature(float temp);
 
+    bool set_fireplace_mode(bool enable);
+
     void setup() override;
     void loop() override;
 
