@@ -225,6 +225,9 @@ namespace esphome::comfortzone
     status.sensors_te7_exhaust_air.subscribe(on_temperature_sensor_update, sensors_te7_exhaust_air);
     status.sensors_te24_hot_water_temp.subscribe(on_temperature_sensor_update, sensors_te24_hot_water_temp);
 
+    status.expansion_valve_calculated_setting.subscribe(on_temperature_sensor_update, expansion_valve_calculated_setting);
+    status.expansion_valve_temperature_difference.subscribe(on_temperature_sensor_update, expansion_valve_temperature_difference);
+
     status.heatpump_current_compressor_frequency.subscribe(on_frequency_sensor_update, heatpump_current_compressor_frequency);
     status.heatpump_current_compressor_power.subscribe(on_power_sensor_update, heatpump_current_compressor_power);
     status.heatpump_current_add_power.subscribe(on_power_sensor_update, heatpump_current_add_power);
@@ -383,6 +386,8 @@ namespace esphome::comfortzone
         sensors_te6_evaporator_in,
         sensors_te7_exhaust_air,
         sensors_te24_hot_water_temp,
+        expansion_valve_calculated_setting,
+        expansion_valve_temperature_difference,
         heatpump_current_compressor_frequency,
         heatpump_current_compressor_power,
         heatpump_current_add_power,

@@ -71,6 +71,12 @@ sensor:
     - name: "Hot water temperature"
       unit_of_measurement: °C
       accuracy_decimals: 1
+    - name: "Expansion valve calculated setting"
+      unit_of_measurement: K
+      accuracy_decimals: 1
+    - name: "Expansion valve temperature difference"
+      unit_of_measurement: K
+      accuracy_decimals: 1
     - name: "Current compressor frequency"
       unit_of_measurement: Hz
     - name: "Current compressor power"
