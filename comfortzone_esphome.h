@@ -118,6 +118,9 @@ namespace esphome::comfortzone
     Sensor *fan_speed_duty = new Sensor();               // %, * 10 (proto: 1.60, 1.80)
     Sensor *hot_water_calculated_setting = new Sensor(); // °C, * 10 (heatpump selected). can be hot_water_setting (no extra hot water) or a different value (proto: 1.60, 1.80)
 
+    Sensor *expansion_valve_calculated_setting = new Sensor(); // K, * 10 (proto: 1.60, 1.80)
+    Sensor *expansion_valve_temperature_difference = new Sensor(); // K, * 10 (proto: 1.60, 1.80)
+
     Sensor *heating_cop = new Sensor();
     Sensor *water_cop = new Sensor();
 
