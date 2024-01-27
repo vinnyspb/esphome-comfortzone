@@ -16,3 +16,9 @@ It can be run using almost any ESP32-compatible board with a RS485 module, but I
 ```
 $ esphome compile comfortzone.yaml && esphome upload comfortzone.yaml && esphome logs comfortzone.yaml
 ```
+
+## Home Assistant Dashboard
+
+Create an empty dashboard in Home Assistant and copy [YAML config](dashboard/comfortzone-dashboard.yaml)
+into it's raw configuration editor. Put images from the [dashboard folder](dashboard/) into `www` folder
+of Home Assistant.

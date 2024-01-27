@@ -1,0 +1,182 @@
+views:
+  - title: Home
+    cards:
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: thermostat
+            entity: climate.comfortzone_ex50_heating
+          - type: thermostat
+            entity: climate.comfortzone_ex50_hot_water
+          - type: gauge
+            entity: sensor.current_compressor_power
+            min: 0
+            max: 5000
+            needle: true
+          - type: gauge
+            entity: sensor.current_compressor_additional_power
+            min: 0
+            max: 6000
+            needle: true
+          - type: entity
+            entity: binary_sensor.defrost_enabled
+            name: Defrost
+            state_color: true
+            icon: mdi:snowflake-melt
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: history-graph
+            entities:
+              - entity: sensor.filtered_flow_water_temperature
+                name: Actual
+              - entity: sensor.target_flow_water_temperature
+                name: Target
+            title: Flow water
+            hours_to_show: 6
+          - type: history-graph
+            hours_to_show: 6
+            entities:
+              - sensor.outdoor_temperature
+          - type: gauge
+            entity: sensor.days_until_filter_change
+            min: 0
+            max: 90
+          - type: history-graph
+            hours_to_show: 169
+            entities:
+              - sensor.heating_cop_average
+      - type: grid
+        square: false
+        columns: 1
+        cards:
+          - type: history-graph
+            entities:
+              - entity: sensor.current_compressor_additional_power
+                name: Additional power
+              - entity: sensor.current_compressor_power
+                name: Compressor output
+            title: Power output
+          - type: history-graph
+            entities:
+              - entity: sensor.current_compressor_heating_input_power
+                name: Electricity consumption
+              - entity: sensor.current_compressor_total_power
+                name: Energy production
+            title: Input/output
+  - title: Schema
+    path: schema
+    badges: []
+    cards:
+      - type: picture-elements
+        image: /local/comfortzone.png
+        elements:
+          - type: state-label
+            entity: sensor.current_compressor_frequency
+            style:
+              top: 34%
+              left: 26%
+              color: black
+          - type: state-label
+            entity: sensor.exhaust_air_temperature
+            style:
+              top: 2%
+              left: 11%
+              color: black
+          - type: state-label
+            entity: sensor.indoor_temperature
+            style:
+              top: 2%
+              left: 55%
+              color: black
+          - type: state-label
+            entity: sensor.return_water_temperature
+            style:
+              top: 42%
+              left: 55%
+              color: black
+          - type: state-label
+            entity: sensor.hot_gas_temperature
+            style:
+              top: 30%
+              left: 36.5%
+              color: black
+          - type: state-label
+            entity: sensor.evaporator_in_temperature
+            style:
+              top: 22.5%
+              left: 31%
+              color: black
+          - type: state-label
+            entity: sensor.expansion_valve_calculated_setting
+            suffix: /
+            style:
+              top: 19%
+              left: 46%
+              color: black
+          - type: state-label
+            entity: sensor.expansion_valve_temperature_difference
+            style:
+              top: 19%
+              left: 55%
+              color: black
+          - type: state-label
+            entity: sensor.outdoor_temperature
+            prefix: 'Utomhus: '
+            style:
+              top: 42%
+              left: 13%
+              color: black
+          - type: state-label
+            entity: sensor.flow_water_temperature
+            style:
+              top: 74%
+              left: 55%
+              color: black
+          - type: state-label
+            entity: sensor.exchanger_out_temperature
+            style:
+              top: 42%
+              left: 39%
+              color: black
+          - type: state-label
+            entity: sensor.hot_water_temperature
+            style:
+              top: 82%
+              left: 18%
+              color: black
+          - type: state-label
+            entity: sensor.current_compressor_additional_power
+            style:
+              top: 52%
+              left: 45%
+              color: black
+              writing-mode: vertical-rl
+          - type: state-label
+            entity: sensor.current_compressor_total_power
+            style:
+              top: 26%
+              left: 11%
+              color: black
+          - type: image
+            entity: binary_sensor.hot_water_production
+            state_image:
+              'on': /local/water.png
+              'off': /local/heating.png
+            style:
+              top: 55.2%
+              left: 14.1%
+              scale: 0.15
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.defrost_enabled
+                state: 'on'
+            elements:
+              - type: state-icon
+                entity: binary_sensor.defrost_enabled
+                icon: mdi:snowflake-melt
+                style:
+                  top: 7.5%
+                  left: 27%
