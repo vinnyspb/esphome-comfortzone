@@ -14,11 +14,20 @@ esphome:
     - esphome_rs485.h
     - comfortzone_esphome.h
     - comfortzone_esphome.cpp
+  on_boot: 
+    - priority: 90
+      then: 
+      - output.turn_off: re_de
 
 esp32:
   board: lolin_s2_mini
   framework:
     type: esp-idf
+
+output:
+  - platform: gpio
+    pin: ${de_pin}
+    id: re_de
 
 uart:
   id: uart_bus
