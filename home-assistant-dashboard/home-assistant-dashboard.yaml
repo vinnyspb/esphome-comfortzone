@@ -30,7 +30,7 @@ views:
         cards:
           - type: history-graph
             entities:
-              - entity: sensor.filtered_flow_water_temperature
+              - entity: sensor.flow_water_temperature
                 name: Actual
               - entity: sensor.target_flow_water_temperature
                 name: Target
@@ -44,10 +44,6 @@ views:
             entity: sensor.days_until_filter_change
             min: 0
             max: 90
-          - type: history-graph
-            hours_to_show: 169
-            entities:
-              - sensor.heating_cop_average
       - type: grid
         square: false
         columns: 1
