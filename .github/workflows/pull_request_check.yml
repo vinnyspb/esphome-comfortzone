@@ -1,0 +1,16 @@
+name: Pull request check build
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 -m venv venv &&
+          source venv/bin/activate &&
+          pip install esphome &&
+          esphome compile comfortzone.yaml
