@@ -14,4 +14,4 @@ jobs:
           python3 -m venv venv &&
           source venv/bin/activate &&
           pip install esphome &&
-          esphome -s git_branch=$GITHUB_SHA compile .github/workflows/test-build.yaml
+          esphome -s git_branch=$GITHUB_SHA compile .github/test/test-build.yaml
