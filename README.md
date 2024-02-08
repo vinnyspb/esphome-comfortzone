@@ -37,9 +37,12 @@ substitutions:
   # https://github.com/qix67/comfortzone_heatpump/blob/master/comfortzone_config.h#L4-L6
   comfortzone_protocol_version: "180"
 
+  # git branch to use for the source code, can be changed during development
+  git_branch: "main"
+
 packages:
   comfortzone_package:
-    url: github://vinnyspb/esphome-comfortzone/comfortzone-package.yaml@main
+    url: github://vinnyspb/esphome-comfortzone/comfortzone-package.yaml@${git_branch}
 
 esphome:
   # Choose a hostname for the ESP32 board on your network

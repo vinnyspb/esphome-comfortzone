@@ -10,7 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
+          cd $GITHUB_WORKSPACE &&
           python3 -m venv venv &&
           source venv/bin/activate &&
           pip install esphome &&
-          esphome compile comfortzone.yaml
+          esphome -s git_branch=$GITHUB_SHA compile .github/workflows/test-build.yaml

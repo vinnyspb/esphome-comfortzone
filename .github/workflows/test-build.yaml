@@ -1,0 +1,28 @@
+substitutions:
+  tx_pin: "35"
+  rx_pin: "36"
+  re_de_pin: "37"
+  comfortzone_protocol_version: "180"
+  git_branch: "main"
+
+packages:
+  comfortzone_package: github://vinnyspb/esphome-comfortzone/comfortzone-package.yaml@${git_branch}
+
+esphome:
+  name: comfortzone
+
+esp32:
+  board: lolin_s2_mini
+  framework:
+    type: esp-idf
+
+logger:
+  level: DEBUG
+
+ota:
+  password: "some_other_password"
+
+wifi:
+  ssid: "some_wifi"
+  password: "some_password"
+  power_save_mode: none
