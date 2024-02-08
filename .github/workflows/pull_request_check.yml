@@ -10,10 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          cd $GITHUB_WORKSPACE &&
-          python3 -m venv venv &&
-          source venv/bin/activate &&
-          pip install esphome &&
-          export GIT_BRANCH=`git branch --show-current` &&
-          esphome -s git_branch $GIT_BRANCH .github/test/test-build.yaml config > /tmp/comfortzone.yaml &&
+          cd $GITHUB_WORKSPACE
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install esphome
+          esphome -s git_branch $GITHUB_REF config .github/test/test-build.yaml > /tmp/comfortzone.yaml
           esphome compile /tmp/comfortzone.yaml

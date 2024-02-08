@@ -5,7 +5,11 @@ esphome:
       - "-DHP_PROTOCOL=${comfortzone_protocol_version}"
 
 external_components:
-  - source: github://vinnyspb/esphome-comfortzone@${git_branch}
+  - source:
+      type: git
+      url: https://github.com/vinnyspb/esphome-comfortzone
+      ref: ${git_branch}
+  # - source: github://vinnyspb/esphome-comfortzone@${git_branch}
     components: [ comfortzone ]
 
 # Tracks the current offset of the indoor temperature sensor
