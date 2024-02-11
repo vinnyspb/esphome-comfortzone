@@ -2,17 +2,29 @@ name: Pull request check build
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          cd $GITHUB_WORKSPACE
-          python3 -m venv venv
+
+      - name: Cache venv
+        id: cache-venv
+        uses: actions/cache@v4
+        with:
+          path: venv
+          key: ${{ runner.os }}-venv
+
+      - name: Prepare venv
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: python3 -m venv venv
+
+      - name: Build comfortzone binary
+        run: |
           source venv/bin/activate
-          pip install esphome
+          pip install -U esphome
+          cd $GITHUB_WORKSPACE
           esphome -s git_branch $GITHUB_HEAD_REF config .github/test/test-build.yaml > comfortzone-build.yaml
           esphome compile comfortzone-build.yaml
