@@ -14,24 +14,17 @@ jobs:
         id: cache-venv
         uses: actions/cache@v4
         with:
-          path: $GITHUB_WORKSPACE/venv
+          path: venv
           key: ${{ runner.os }}-venv
 
-      - name: Install dependencies into venv
+      - name: Prepare venv
         if: steps.cache-venv.outputs.cache-hit != 'true'
-        run: |
-          cd $GITHUB_WORKSPACE
-          python3 -m venv venv
-
-      - name: Install/update esphome
-        run: |
-          cd $GITHUB_WORKSPACE
-          source venv/bin/activate
-          pip install -U esphome
+        run: python3 -m venv venv
 
       - name: Build comfortzone binary
         run: |
-          cd $GITHUB_WORKSPACE
           source venv/bin/activate
+          pip install -U esphome
+          cd $GITHUB_WORKSPACE
           esphome -s git_branch $GITHUB_HEAD_REF config .github/test/test-build.yaml > comfortzone-build.yaml
           esphome compile comfortzone-build.yaml
