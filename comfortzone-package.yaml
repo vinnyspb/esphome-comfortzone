@@ -9,7 +9,6 @@ external_components:
       type: git
       url: https://github.com/vinnyspb/esphome-comfortzone
       ref: ${git_branch}
-  # - source: github://vinnyspb/esphome-comfortzone@${git_branch}
     components: [ comfortzone ]
 
 # Tracks the current offset of the indoor temperature sensor
@@ -29,7 +28,11 @@ uart:
   stop_bits: 1
 
 comfortzone:
-  re_de_pin: ${re_de_pin}
+  re_de_pin:
+    number: ${re_de_pin}
+    mode:
+      output: true
+      pulldown: true
   te3_offset_global_id: te3_offset
 
 sensor:
