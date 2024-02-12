@@ -41,8 +41,7 @@ substitutions:
   git_branch: "main"
 
 packages:
-  comfortzone_package:
-    url: github://vinnyspb/esphome-comfortzone/comfortzone-package.yaml@${git_branch}
+  comfortzone_package: github://vinnyspb/esphome-comfortzone/comfortzone-package.yaml@${git_branch}
 
 esphome:
   # Choose a hostname for the ESP32 board on your network
