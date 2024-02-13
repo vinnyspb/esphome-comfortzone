@@ -28,11 +28,7 @@ uart:
   stop_bits: 1
 
 comfortzone:
-  re_de_pin:
-    number: ${re_de_pin}
-    mode:
-      output: true
-      pulldown: true
+  re_de_pin: ${re_de_pin}
   te3_offset_global_id: te3_offset
 
 sensor:
