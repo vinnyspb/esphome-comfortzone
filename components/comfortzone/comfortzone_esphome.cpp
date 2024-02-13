@@ -252,7 +252,12 @@ namespace esphome::comfortzone
     this->te3_offset_ = te3_offset;
   }
 
-  void ComfortzoneComponent::set_re_de_pin(GPIOPin *re_de_pin) { this->re_de_pin_ = re_de_pin; }
+  void ComfortzoneComponent::set_re_de_pin(GPIOPin *re_de_pin) {
+    this->re_de_pin_ = re_de_pin;
+
+    // pull down the pin ASAP to avoid any communication with the heatpump
+    this->re_de_pin_->digital_write(false);
+  }
 
 #ifdef USE_SENSOR
   void ComfortzoneComponent::set_fan_time_to_filter_change_sensor(sensor::Sensor *fan_time_to_filter_change) { this->fan_time_to_filter_change_ = fan_time_to_filter_change; }
