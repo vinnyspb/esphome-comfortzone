@@ -3,6 +3,7 @@ CONF_TE3_OFFSET_GLOBAL_ID = "te3_offset_global_id"
 
 CONF_FAN_TIME_TO_FILTER_CHANGE = "fan_time_to_filter_change"
 CONF_FILTER_ALARM = "filter_alarm"
+CONF_GENERAL_ALARM = "general_alarm"
 CONF_HOT_WATER_PRODUCTION = "hot_water_production"
 CONF_ROOM_HEATING_IN_PROGRESS = "room_heating_in_progress"
 CONF_COMPRESSOR_ACTIVITY = "compressor_activity"
@@ -48,5 +49,4 @@ CONF_WATER_HEATER_CLIMATE = "water_heater_climate"
 
 CONF_RE_DE_PIN = "re_de_pin"
 
-UNIT_DAY = "days"
-
+UNIT_DAY = "d"

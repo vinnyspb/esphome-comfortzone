@@ -16,6 +16,7 @@ from . import (
 from .const import (
     CONF_COMFORTZONE_ID,
     CONF_FILTER_ALARM,
+    CONF_GENERAL_ALARM,
     CONF_HOT_WATER_PRODUCTION,
     CONF_ROOM_HEATING_IN_PROGRESS,
     CONF_ADDITIONAL_POWER_ENABLED,
@@ -31,6 +32,10 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(CONF_COMFORTZONE_ID): cv.use_id(ComfortzoneComponent),
         cv.Optional(CONF_FILTER_ALARM): binary_sensor.binary_sensor_schema(
             icon=ICON_FAN,
+            device_class=DEVICE_CLASS_PROBLEM,
+        ),
+        cv.Optional(CONF_GENERAL_ALARM): binary_sensor.binary_sensor_schema(
+            icon=ICON_HEATING_COIL,
             device_class=DEVICE_CLASS_PROBLEM,
         ),
         cv.Optional(CONF_HOT_WATER_PRODUCTION): binary_sensor.binary_sensor_schema(
@@ -57,6 +62,7 @@ CONFIG_SCHEMA = cv.Schema(
 )
 BINARY_SENSORS_INIT = {
     CONF_FILTER_ALARM: "set_filter_alarm_sensor",
+    CONF_GENERAL_ALARM: "set_general_alarm_sensor",
     CONF_HOT_WATER_PRODUCTION: "set_hot_water_production_sensor",
     CONF_ROOM_HEATING_IN_PROGRESS: "set_room_heating_in_progress_sensor",
     CONF_ADDITIONAL_POWER_ENABLED: "set_additional_power_enabled_sensor",
