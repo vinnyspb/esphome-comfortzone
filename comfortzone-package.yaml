@@ -114,6 +114,8 @@ binary_sensor:
   - platform: comfortzone
     filter_alarm:
       name: "Filter alarm"
+    general_alarm:
+      name: "General alarm"
     hot_water_production:
       name: "Hot water production"
     room_heating_in_progress:

@@ -96,6 +96,7 @@ namespace esphome::comfortzone
 
 #ifdef USE_BINARY_SENSOR
     void set_filter_alarm_sensor(binary_sensor::BinarySensor *filter_alarm);
+    void set_general_alarm_sensor(binary_sensor::BinarySensor *general_alarm);
     void set_hot_water_production_sensor(binary_sensor::BinarySensor *hot_water_production);
     void set_room_heating_in_progress_sensor(binary_sensor::BinarySensor *room_heating_in_progress);
     void set_additional_power_enabled_sensor(binary_sensor::BinarySensor *additional_power_enabled);
@@ -185,6 +186,7 @@ namespace esphome::comfortzone
 
 #ifdef USE_BINARY_SENSOR
     binary_sensor::BinarySensor *filter_alarm_{nullptr}; // true = replace/clean filter alarm, false = filter ok (proto: 1.60, 1.80)
+    binary_sensor::BinarySensor *general_alarm_{nullptr}; // true = any alarm except filter, false = no alarm (proto: 1.60, 1.80)
 
     binary_sensor::BinarySensor *hot_water_production_{nullptr};     // true = on, false = off
     binary_sensor::BinarySensor *room_heating_in_progress_{nullptr}; // true = on, false = off
