@@ -296,6 +296,7 @@ namespace esphome::comfortzone
 
 #ifdef USE_BINARY_SENSOR
   void ComfortzoneComponent::set_filter_alarm_sensor(binary_sensor::BinarySensor *filter_alarm) { this->filter_alarm_ = filter_alarm; }
+  void ComfortzoneComponent::set_general_alarm_sensor(binary_sensor::BinarySensor *general_alarm) { this->general_alarm_ = general_alarm; }
   void ComfortzoneComponent::set_hot_water_production_sensor(binary_sensor::BinarySensor *hot_water_production) { this->hot_water_production_ = hot_water_production; }
   void ComfortzoneComponent::set_room_heating_in_progress_sensor(binary_sensor::BinarySensor *room_heating_in_progress) { this->room_heating_in_progress_ = room_heating_in_progress; }
   void ComfortzoneComponent::set_additional_power_enabled_sensor(binary_sensor::BinarySensor *additional_power_enabled) { this->additional_power_enabled_ = additional_power_enabled; }
@@ -376,6 +377,7 @@ namespace esphome::comfortzone
 
 #ifdef USE_BINARY_SENSOR
     status.filter_alarm.subscribe(on_bool_sensor_update, filter_alarm_);
+    status.general_alarm.subscribe(on_bool_sensor_update, general_alarm_);
     status.hot_water_production.subscribe(on_bool_sensor_update, hot_water_production_);
     status.room_heating_in_progress.subscribe(on_bool_sensor_update, room_heating_in_progress_);
     status.additional_power_enabled.subscribe(on_bool_sensor_update, additional_power_enabled_);
@@ -435,20 +437,6 @@ namespace esphome::comfortzone
         water_heater_climate_->mode = in_progress ? climate::CLIMATE_MODE_HEAT : climate::CLIMATE_MODE_OFF;
         water_heater_climate_->publish_state(); });
     }
-#endif
-
-#ifdef USE_API
-    // Services exposed to Home Assistant are declared here
-    register_service(&ComfortzoneComponent::set_sensor_offset, "set_sensor_offset",
-                     {"sensor_num", "offset"});
-    register_service(&ComfortzoneComponent::override_indoor_temperature, "override_indoor_temperature",
-                     {"current_temperature"});
-    register_service(&ComfortzoneComponent::debug_reroute, "debug_reroute",
-                     {"ip", "port", "timeout"});
-    register_service(&ComfortzoneComponent::enable_fireplace_mode, "enable_fireplace_mode",
-                     {});
-    register_service(&ComfortzoneComponent::disable_fireplace_mode, "disable_fireplace_mode",
-                     {});
 #endif
 
     heatpump_->begin();

@@ -20,7 +20,8 @@ logger:
   level: DEBUG
 
 ota:
-  password: "some_other_password"
+  - platform: esphome
+    password: "some_other_password"
 
 wifi:
   ssid: "some_wifi"

@@ -14,6 +14,7 @@ from esphome.const import (
     DEVICE_CLASS_FREQUENCY,
     UNIT_WATT,
     DEVICE_CLASS_POWER,
+    DEVICE_CLASS_POWER_FACTOR,
     UNIT_KILOWATT_HOURS,
     DEVICE_CLASS_ENERGY,
     UNIT_MINUTE,
@@ -226,7 +227,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_FAN_SPEED_DUTY): sensor.sensor_schema(
             unit_of_measurement=UNIT_PERCENT,
             icon=ICON_FAN,
-            device_class=DEVICE_CLASS_POWER,
+            device_class=DEVICE_CLASS_POWER_FACTOR,
             state_class=STATE_CLASS_MEASUREMENT,
         ),
         cv.Optional(CONF_HOT_WATER_CALCULATED_SETTING): sensor.sensor_schema(

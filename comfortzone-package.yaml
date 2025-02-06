@@ -5,10 +5,8 @@ esphome:
       - "-DHP_PROTOCOL=${comfortzone_protocol_version}"
 
 external_components:
-  - source:
-      type: git
-      url: https://github.com/vinnyspb/esphome-comfortzone
-      ref: ${git_branch}
+  - source: github://vinnyspb/esphome-comfortzone@${git_branch}
+  # - source: components
     components: [ comfortzone ]
 
 # Tracks the current offset of the indoor temperature sensor
@@ -28,6 +26,7 @@ uart:
   stop_bits: 1
 
 comfortzone:
+  comfortzone_id: comfortzone_component
   re_de_pin: ${re_de_pin}
   te3_offset_global_id: te3_offset
 
@@ -114,6 +113,8 @@ binary_sensor:
   - platform: comfortzone
     filter_alarm:
       name: "Filter alarm"
+    general_alarm:
+      name: "General alarm"
     hot_water_production:
       name: "Hot water production"
     room_heating_in_progress:
@@ -153,3 +154,33 @@ time:
 
 # Enables exposure of built-in services to Home Assistant
 api:
+  actions:
+    - action: set_sensor_offset
+      variables:
+        sensor_num: int
+        offset: float
+      then:
+        - lambda: >-
+            id(comfortzone_component)->set_sensor_offset(sensor_num, offset);
+    - action: override_indoor_temperature
+      variables:
+        current_temperature: float
+      then:
+        - lambda: >-
+            id(comfortzone_component)->override_indoor_temperature(current_temperature);
+    - action: debug_reroute
+      variables:
+        ip: string
+        port: int
+        timeout: int
+      then:
+        - lambda: >-
+            id(comfortzone_component)->debug_reroute(ip, port, timeout);
+    - action: enable_fireplace_mode
+      then:
+        - lambda: >-
+            id(comfortzone_component)->enable_fireplace_mode();
+    - action: disable_fireplace_mode
+      then:
+        - lambda: >-
+            id(comfortzone_component)->disable_fireplace_mode();

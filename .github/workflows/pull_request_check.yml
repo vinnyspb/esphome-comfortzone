@@ -27,4 +27,4 @@ jobs:
           pip install -U esphome
           cd $GITHUB_WORKSPACE
           esphome -s git_branch $GITHUB_HEAD_REF config .github/test/test-build.yaml > comfortzone-build.yaml
-          esphome compile comfortzone-build.yaml
+          esphome -s git_branch $GITHUB_HEAD_REF compile comfortzone-build.yaml
