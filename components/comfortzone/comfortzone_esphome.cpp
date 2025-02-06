@@ -439,20 +439,6 @@ namespace esphome::comfortzone
     }
 #endif
 
-#ifdef USE_API
-    // Services exposed to Home Assistant are declared here
-    register_service(&ComfortzoneComponent::set_sensor_offset, "set_sensor_offset",
-                     {"sensor_num", "offset"});
-    register_service(&ComfortzoneComponent::override_indoor_temperature, "override_indoor_temperature",
-                     {"current_temperature"});
-    register_service(&ComfortzoneComponent::debug_reroute, "debug_reroute",
-                     {"ip", "port", "timeout"});
-    register_service(&ComfortzoneComponent::enable_fireplace_mode, "enable_fireplace_mode",
-                     {});
-    register_service(&ComfortzoneComponent::disable_fireplace_mode, "disable_fireplace_mode",
-                     {});
-#endif
-
     heatpump_->begin();
   }
 
