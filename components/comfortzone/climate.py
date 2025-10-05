@@ -20,10 +20,10 @@ ComfortzoneWaterHeaterClimate = comfortzone_ns.class_("ComfortzoneWaterHeaterCli
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_COMFORTZONE_ID): cv.use_id(ComfortzoneComponent),
-        cv.Optional(CONF_HEATPUMP_CLIMATE): climate.CLIMATE_SCHEMA.extend({
+        cv.Optional(CONF_HEATPUMP_CLIMATE): climate.climate_schema(ComfortzoneHeatpumpClimate).extend({
             cv.GenerateID(): cv.declare_id(ComfortzoneHeatpumpClimate),
         }),
-        cv.Optional(CONF_WATER_HEATER_CLIMATE): climate.CLIMATE_SCHEMA.extend({
+        cv.Optional(CONF_WATER_HEATER_CLIMATE): climate.climate_schema(ComfortzoneWaterHeaterClimate).extend({
             cv.GenerateID(): cv.declare_id(ComfortzoneWaterHeaterClimate),
         }),
     }
