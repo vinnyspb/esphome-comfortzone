@@ -141,10 +141,12 @@ namespace esphome::comfortzone
     {
       sensor->publish_state("hot_water");
     }
+#if HP_PROTOCOL == HP_PROTOCOL_1_8
     else if (value == CZMD_ROOM_HEATING_AND_HOT_WATER)
     {
       sensor->publish_state("heating_and_hot_water");
     }
+#endif
     else
     {
       sensor->publish_state("incorrect");
@@ -162,10 +164,12 @@ namespace esphome::comfortzone
     {
       sensor->publish_state("stopped");
     }
+#if HP_PROTOCOL == HP_PROTOCOL_1_8
     else if (value == CZCMP_DEFROST)
     {
       sensor->publish_state("defrost");
     }
+#endif
     else if (value == CZCMP_RUNNING)
     {
       sensor->publish_state("running");
